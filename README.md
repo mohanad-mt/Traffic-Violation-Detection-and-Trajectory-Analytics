@@ -100,6 +100,8 @@ The evaluator pairs each prediction with at most one label by lane, event type, 
 
 The [nighttime road clip check](benchmarks/nighttime/README.md) uses pretrained YOLOX-S on an eight-second sample of real traffic with a manually annotated lane. It covers one clip with no labeled events.
 
+The [experiment log](benchmarks/README.md) records the synthetic, nighttime-road, and timestamped wrong-way runs, including unsuccessful parameter changes.
+
 The [AI City Challenge 2021 Traffic Anomaly Detection track](https://www.aicitychallenge.org/2021-data-and-evaluation/#:~:text=Track%204%3A%20Traffic%20Anomaly%20Detection) provides real traffic footage with timestamps for anomalies such as stalls and crashes. For this project's three event classes, review scene-specific labels and record red phases where visible or available.
 
 ## Development

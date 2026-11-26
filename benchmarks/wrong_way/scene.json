@@ -1,0 +1,8 @@
+{
+  "lane": {
+    "id": "left-carriageway",
+    "polygon": [[126, 90], [171, 96], [196, 236], [5, 214]],
+    "forward": [-0.35, 1]
+  },
+  "thresholds": {"min_step_px": 0.6}
+}
