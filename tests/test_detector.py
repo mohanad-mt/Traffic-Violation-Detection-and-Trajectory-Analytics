@@ -6,6 +6,7 @@ from pathlib import Path
 
 from traffic_trajectory.detector import detect_events, detect_wrong_way
 from traffic_trajectory.scenario import parse_scenario
+from traffic_trajectory.trajectory import project_track
 
 ROOT = Path(__file__).resolve().parents[1]
 DEMO = ROOT / "examples" / "demo.json"
@@ -32,6 +33,39 @@ def scenario_with_track(samples):
 
 
 class WrongWayDetectionTests(unittest.TestCase):
+    def test_frame_rate_normalized_rule_and_second_lane(self):
+        for fps in (5, 25):
+            with self.subTest(fps=fps):
+                normal = [(i / fps, 100 - 40 * i / fps, 20) for i in range(fps + 1)]
+                payload = scenario_with_track(normal)
+                opposite = {
+                    "id": "westbound",
+                    "polygon": [[0, 50], [200, 50], [200, 90], [0, 90]],
+                    "forward": [-1, 0],
+                }
+                payload["lanes"] = [payload.pop("lane"), opposite]
+                payload["tracks"].append(
+                    make_track(
+                        "other", [(i / fps, 100 + 40 * i / fps, 70) for i in range(fps + 1)]
+                    )
+                )
+                payload["thresholds"] = {"min_step_px": 0, "min_reverse_speed_px_s": 30}
+                events = detect_wrong_way(parse_scenario(payload))
+                self.assertEqual({event.lane_id for event in events}, {"eastbound", "westbound"})
+                self.assertTrue(all(event.confirmed_s == 1 for event in events))
+
+    def test_projected_velocity_resets_after_observation_gap(self):
+        payload = scenario_with_track([(0, 20, 20), (0.5, 40, 25), (2, 60, 20)])
+        payload["ground_plane"] = {
+            "unit": "reference units",
+            "image_to_world": [[0.25, 0, 0], [0, 0.1, 0], [0, 0, 1]],
+        }
+        scene = parse_scenario(payload)
+        samples = list(project_track(scene.tracks[0], scene.ground_plane, 0.75))
+        self.assertEqual(samples[0]["position"], (5, 2))
+        self.assertEqual(samples[1]["velocity"], (10, 1))
+        self.assertIsNone(samples[2]["velocity"])
+
     def test_demo_reports_one_candidate(self):
         scenario = parse_scenario(json.loads(DEMO.read_text(encoding="utf-8")))
         events = detect_wrong_way(scenario)

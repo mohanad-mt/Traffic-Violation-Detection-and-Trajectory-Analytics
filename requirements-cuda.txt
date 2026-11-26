@@ -1,0 +1,2 @@
+-r requirements-video.txt
+onnxruntime-gpu==1.32.0

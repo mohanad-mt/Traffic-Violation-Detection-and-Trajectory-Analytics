@@ -9,7 +9,8 @@ from pathlib import Path
 import cv2
 
 from benchmarks.foggy_driving.evaluate_boxes import BoxCounts, _area, examples
-from traffic_trajectory.yolox import NMS_IOU, VehicleBox, YoloXDetector, _suppress
+from traffic_trajectory.detection import NMS_IOU, BoxDetector, VehicleBox, _suppress
+from traffic_trajectory.yolox import YoloXDetector
 
 
 @dataclass(frozen=True)
@@ -43,7 +44,7 @@ def score(images: list[ImageBoxes], settings: Settings) -> BoxCounts:
     return counts
 
 
-def calibrate(archive: Path, detector: YoloXDetector) -> dict:
+def calibrate(archive: Path, detector: BoxDetector) -> dict:
     calibration = [
         ImageBoxes(*detector._frame_views(frame), labels)
         for frame, labels in examples(archive, "test_extra")

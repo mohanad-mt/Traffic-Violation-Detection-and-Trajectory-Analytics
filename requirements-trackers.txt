@@ -1,0 +1,4 @@
+numpy==2.4.3
+opencv-python==4.13.0.92
+trackers==2.7.0
+trackeval==1.3.0
