@@ -71,7 +71,7 @@ The [track fixture](examples/demo.json) emits one wrong-way candidate after 1.0 
 Every scene has a `lane` with an `id`, a convex `polygon` in boundary order, and a nonzero `forward` vector pointing in the legal direction. Use image coordinates, with x increasing rightward and y increasing downward. For track input, supply `tracks` with unique IDs and observations in strictly increasing `timestamp_s` order. Use the bottom center of each vehicle box for its `position`.
 
 - **Wrong way.** Follow reverse steps in the lane that meet the heading and observation-gap thresholds. Allow brief steps below `min_step_px` for detection jitter. Emit one event when both the duration and net reverse displacement pass their thresholds.
-- **Stopped.** Start a timer when the vehicle enters the lane or moves outside its current stop radius. Emit one event if it stays within the radius for the required duration. A tracking gap or lane exit also resets the timer.
+- **Stopped.** Start a timer when the vehicle enters the lane or moves outside its current stop radius. A tracking gap or lane exit resets the timer. After an alert, a nearby stationary fragment can keep the reported stop active across a short gap. An observed departure allows a new alert.
 - **Red light.** Set `stop_line.segment` with two endpoints and `stop_line.red_intervals_s` with ordered, non-overlapping `[start, end)` intervals relative to the first frame. The vehicle must approach and clear a margin on both sides of the line. The red interval is checked at the interpolated crossing time. Use synchronized signal data or annotate the red intervals from the clip. [Example scene](examples/video.scene.json)
 
 Set overrides in `thresholds`. Pixel-based thresholds depend on camera perspective and frame rate. The stopped rule can flag cars waiting in a queue. Output is sorted by confirmation time and track ID.
@@ -86,6 +86,7 @@ Set overrides in `thresholds`. Pixel-based thresholds depend on camera perspecti
 | `max_pause_s` | 0.25 | Time a reverse episode can tolerate subthreshold steps |
 | `stopped_duration_s` | 3.0 | Minimum time within the stopped radius |
 | `stopped_radius_px` | 4 | Maximum distance from the stop anchor |
+| `stopped_realert_gap_s` | 2.0 | Longest gap for treating nearby stationary fragments as a reported stop. Set to 0 to disable. |
 | `red_line_margin_px` | 2 | Minimum perpendicular distance to arm and confirm a crossing |
 
 ## Evaluation

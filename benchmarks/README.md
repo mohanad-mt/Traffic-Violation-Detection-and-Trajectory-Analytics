@@ -25,4 +25,17 @@ The demo runs the pipeline from GitHub commit `055a49c`. The nighttime and NJIT 
 
 The [road validation clips](road_validation/README.md) add a second wrong-way camera, a highway stop, and a red-light crossing. The red-light case matched. Stop scoring changed with the confidence cutoff and onset tolerance. The foggy wrong-way case still missed its reference event.
 
+## Stop deduplication and fog diagnosis
+
+| Trial | Result |
+| --- | --- |
+| Highway stop, YOLOX-S at 0.08, full frame | With 0 or 2 s of re-alert grace, one match and one duplicate. With 5 s for this scene, one match and zero extra alerts. The original alert still starts at 4.40 s and confirms at 7.47 s. |
+| Foggy highway, hand-traced points | One match. The wrong-way rule confirmed 44.57 px of net reverse movement at 4.40 s. |
+| Foggy highway, YOLOX-M at 0.08 | 135 observations at full frame and 26 with the original crop. Neither run matched the event. |
+| Shadowed highway, YOLOX-S and YOLOX-M at 0.08 | The same crop yielded 206 observations with S and 398 with M. Both missed the single reference event. |
+
+The highway stop had an intervening stationary fragment. The longest gap after that fragment was about 4.27 s, which is why the 2 s default left the duplicate in place. The 5 s setting was chosen on this clip. A longer gap can hide a second vehicle stopping in the same spot.
+
+The fog check used seven approximate points on the wrong-way vehicle. Neither model supplied a detection within 12 px of any of those points at the sampled times. The hand trace checks the rule with enough observations to form a track. [Scene files and commands](road_validation/README.md)
+
 For a broader evaluation, annotate vehicles and event times across several fixed cameras, including distant vehicles in low contrast and a signalized clip with synchronized phases. AI City's 2021 anomaly track has timestamped stalls and crashes. [Dataset notes](https://www.aicitychallenge.org/2021-data-and-evaluation/#:~:text=Track%204%3A%20Traffic%20Anomaly%20Detection)

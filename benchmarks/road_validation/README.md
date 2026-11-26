@@ -5,6 +5,7 @@ Each clip has one event in the annotated area. The NJIT timestamps come from the
 | Case | Source and extract | SHA-256 |
 | --- | --- | --- |
 | Wrong way | [NJIT foggy highway clip](https://web.njit.edu/~cliu/NJDOT/wrong-way/wrong_way_cam3.mp4), 0–8 s. [Timestamp log](https://web.njit.edu/~cliu/NJDOT/wrong-way/wrong-way.txt) | `91eea63673d648e42d348204d7bbc831cabe36a80f13675ca853e3c6aedb4588` |
+| Wrong way in shadow | [NJIT shadowed highway clip](https://web.njit.edu/~cliu/NJDOT/wrong-way/wrong_way_cam2.mp4), 1–8 s. [Timestamp log](https://web.njit.edu/~cliu/NJDOT/wrong-way/wrong-way.txt) | `b94ca1e81f437c3c98ee50b78066fb378cc7c8e65440aa18f36e90a42e1bbd39` |
 | Stopped vehicle | [NJIT highway clip](https://web.njit.edu/~cliu/NJDOT/stopped-veh/CCTV_1-2014-9-4-11-0.mp4), 30–51 s. [Timestamp log](https://web.njit.edu/~cliu/NJDOT/stopped-veh/stopped-veh.txt) | `5126407d4e3de00a22a36abf8a4e4bb5d5252952505c01d763e1a956be43b23f` |
 | Red light | [Tiago Silva, Dataset for Traffic Evaluation](https://doi.org/10.5281/zenodo.14041920), `rlr_occasions.mp4`, 4.5–7.8 s | `58b953698121e06c43a4f6398b11bab7485782f8b82c91a556b6d32923d7bd78` |
 
@@ -16,9 +17,11 @@ Each clip has one event in the annotated area. The NJIT timestamps come from the
 | Foggy wrong way, crop at 0.08 | ±1.0 s | 0/1 | 0 | 11 observations. The reference vehicle did not yield a usable track. |
 | Highway stop, full frame at 0.35 | ±1.0 s | 0/1 | 0 | No stop alert. |
 | Highway stop, full frame at 0.08 | ±1.0 s | 1/1 | 1 | The matched alert started at 4.40 s. A second track near the same spot emitted another alert after a gap. |
+| Highway stop, full frame at 0.08, 5 s re-alert gap | ±1.0 s | 1/1 | 0 | The earlier alert kept its onset and confirmation times. |
 | Highway stop, crop at 0.08 | ±1.0 s | 0/1 | 1 | The single alert started at 2.80 s, 2.20 s before the reference. It matches at ±3.0 s. |
 | Highway stop, crop with continuation cutoff 0.08 | ±1.0 s | 0/1 | 0 | No alert at either track-start cutoff, 0.20 or 0.35. |
 | Red light, full frame at 0.35 | ±0.5 s | 1/1 | 0 | Estimated crossing at 2.24 s, confirmed at 2.50 s. The label is 1.80 s. |
+| Shadowed wrong way, crop at 0.08 | ±1.0 s | 0/1 | 0 | YOLOX-S and YOLOX-M both missed the event. |
 
 The foggy clip had intermittent detections. A contrast trial applied OpenCV CLAHE to the Lab luminance channel with clip limit 2 and 8 × 8 tiles. It produced 22 observations with the original crop and 65 with crop `100 133 202 240`. Both runs missed the reference event. Each clip has one positive, so these scores describe the clips.
 
@@ -41,3 +44,40 @@ python -m traffic_trajectory.evaluate build/road/red.json benchmarks/road_valida
 ```
 
 Omit `--confidence` and `--detection-roi` for the full-frame 0.35 runs. For the highway stop crop, add `--detection-roi 130 25 260 146` to the stop command. Use `--include-tracks` to inspect how long each vehicle track survives.
+
+### Stop re-alert gap
+
+Copy `stop.scene.json` and add `"stopped_realert_gap_s": 5` to its `thresholds`. Repeat the full-frame 0.08 run with that file. The shorter stationary fragment ends at 10.80 s and the next track starts at 15.07 s. Both stay close to the original stop.
+
+### Wrong-way detector checks
+
+The [manual trace](fog.manual-trace.json) uses approximate bottom centers from the footage. Run it through track mode to check the event rule with a continuous path.
+
+```sh
+python -m traffic_trajectory benchmarks/road_validation/fog.manual-trace.json > build/road/fog-rule.json
+python -m traffic_trajectory.evaluate build/road/fog-rule.json benchmarks/road_validation/wrong.labels.json --tolerance-s 1
+
+python benchmarks/wrong_way/prepare_clip.py wrong_way_cam2.mp4 build/road/shadow.avi --start-frame 15 --source-frames 105
+python -m traffic_trajectory benchmarks/road_validation/shadow.scene.json --video build/road/shadow.avi --model object_detection_yolox_2022nov.onnx --confidence 0.08 --detection-roi 35 55 245 240 > build/road/shadow.json
+python -m traffic_trajectory.evaluate build/road/shadow.json benchmarks/road_validation/shadow.labels.json --tolerance-s 1
+```
+
+The larger model trial used the upstream `yolox_m.onnx` with SHA-256 `21ff6cfdeb53b013bac2249599e55f00bff3cfdfdab37ed7a4620818c1d15b3f`. It expects BGR. The benchmark swapped channels before passing frames to the existing detector, which swaps again for the OpenCV Zoo export. [Upstream weights and preprocessing](https://github.com/Megvii-BaseDetection/YOLOX/blob/main/demo/ONNXRuntime/README.md)
+
+```python
+import cv2
+from pathlib import Path
+
+from traffic_trajectory.video import track_video
+from traffic_trajectory.yolox import YoloXDetector
+
+detector = YoloXDetector(Path("yolox_m.onnx"), 0.08, roi=(35, 55, 245, 240))
+tracks = track_video(
+    Path("build/road/shadow.avi"),
+    lambda frame: detector(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)),
+    max_gap_s=0.75,
+    max_distance_px=24,
+)
+```
+
+Use the shadow scene and labels to score those tracks. For the fog runs, use `wrong.avi` with the wrong-way scene and labels. Set `roi=None` for the full frame or `roi=(78, 85, 211, 240)` for the crop.

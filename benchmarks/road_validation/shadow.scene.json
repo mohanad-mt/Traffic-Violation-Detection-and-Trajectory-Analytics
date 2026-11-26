@@ -1,0 +1,8 @@
+{
+  "lane": {
+    "id": "shadow",
+    "polygon": [[58, 98], [104, 96], [232, 237], [128, 237]],
+    "forward": [0.65, 1]
+  },
+  "thresholds": {"min_step_px": 0.6}
+}
