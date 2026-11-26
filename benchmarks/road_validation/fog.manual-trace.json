@@ -1,0 +1,22 @@
+{
+  "lane": {
+    "id": "wrong",
+    "polygon": [[98, 128], [123, 127], [194, 239], [117, 239]],
+    "forward": [0.33, 1]
+  },
+  "thresholds": {"min_step_px": 0.6},
+  "tracks": [
+    {
+      "id": "manual-reference",
+      "observations": [
+        {"timestamp_s": 2.8, "position": [175, 227]},
+        {"timestamp_s": 3.2, "position": [173, 218]},
+        {"timestamp_s": 3.6, "position": [170, 214]},
+        {"timestamp_s": 4.0, "position": [156, 197]},
+        {"timestamp_s": 4.4, "position": [154, 187]},
+        {"timestamp_s": 4.8, "position": [148, 181]},
+        {"timestamp_s": 5.2, "position": [146, 178]}
+      ]
+    }
+  ]
+}

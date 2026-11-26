@@ -1,0 +1,12 @@
+{
+  "events": [
+    {
+      "track_id": "vehicle-reversing",
+      "lane_id": "eastbound",
+      "start_s": 0.0,
+      "confirmed_s": 1.0,
+      "reverse_distance_px": 40.0,
+      "type": "wrong_way_candidate"
+    }
+  ]
+}

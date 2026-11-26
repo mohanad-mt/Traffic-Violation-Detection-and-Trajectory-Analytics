@@ -1,0 +1,5 @@
+{
+  "events": [
+    {"type": "wrong_way_candidate", "lane_id": "shadow", "start_s": 3}
+  ]
+}

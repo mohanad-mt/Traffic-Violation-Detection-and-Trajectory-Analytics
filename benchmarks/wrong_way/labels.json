@@ -1,0 +1,6 @@
+{
+  "events": [
+    {"type": "wrong_way_candidate", "lane_id": "left-carriageway", "start_s": 2.0},
+    {"type": "wrong_way_candidate", "lane_id": "left-carriageway", "start_s": 11.0}
+  ]
+}

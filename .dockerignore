@@ -1,0 +1,4 @@
+*
+!requirements-video.txt
+!traffic_trajectory/
+!traffic_trajectory/*.py

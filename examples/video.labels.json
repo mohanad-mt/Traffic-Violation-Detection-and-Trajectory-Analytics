@@ -1,0 +1,7 @@
+{
+  "events": [
+    {"type": "wrong_way_candidate", "lane_id": "eastbound", "start_s": 0.0},
+    {"type": "stopped_vehicle_candidate", "lane_id": "eastbound", "start_s": 0.0},
+    {"type": "red_light_crossing_candidate", "lane_id": "eastbound", "start_s": 3.0}
+  ]
+}
