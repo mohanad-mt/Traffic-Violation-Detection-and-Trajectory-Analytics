@@ -6,11 +6,10 @@ import cv2
 import numpy as np
 from cv2.typing import MatLike
 
-from .geometry import Point
 from .scenario import Track
-from .tracker import PointTracker
+from .tracker import FrameDetections, PointTracker
 
-type FrameDetector = Callable[[MatLike], list[Point]]
+type FrameDetector = Callable[[MatLike], FrameDetections]
 
 
 def foreground_detector(background_path: Path, min_area_px: int) -> FrameDetector:
@@ -20,7 +19,7 @@ def foreground_detector(background_path: Path, min_area_px: int) -> FrameDetecto
         raise ValueError(f"cannot decode background image: {background_path}")
     kernel = np.ones((3, 3), dtype=np.uint8)
 
-    def detect(frame: MatLike) -> list[Point]:
+    def detect(frame: MatLike) -> FrameDetections:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         if gray.shape != background.shape:
             raise ValueError("background image dimensions must match the video")
@@ -33,7 +32,7 @@ def foreground_detector(background_path: Path, min_area_px: int) -> FrameDetecto
             for x, y, width, height, area in boxes[1:]
             if area >= min_area_px
         ]
-        return sorted(points)
+        return FrameDetections(sorted(points))
 
     return detect
 
@@ -57,7 +56,8 @@ def track_video(
             ok, frame = capture.read()
             if not ok:
                 break
-            tracker.update(frame_index / fps, detect(frame))
+            detections = detect(frame)
+            tracker.update(frame_index / fps, detections.strong, weak_detections=detections.weak)
             frame_index += 1
         if frame_index == 0:
             raise ValueError("video has no decodable frames")

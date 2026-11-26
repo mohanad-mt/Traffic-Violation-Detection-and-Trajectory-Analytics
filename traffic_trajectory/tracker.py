@@ -1,7 +1,14 @@
+from dataclasses import dataclass, field
 from math import dist
 
 from .geometry import Point
 from .scenario import Observation, Track
+
+
+@dataclass(frozen=True)
+class FrameDetections:
+    strong: list[Point]
+    weak: list[Point] = field(default_factory=list)
 
 
 class PointTracker:
@@ -23,18 +30,19 @@ class PointTracker:
         px, py = previous.position
         return x + ratio * (x - px), y + ratio * (y - py)
 
-    def update(self, timestamp_s: float, detections: list[Point]) -> None:
-        self.active = {
-            index
-            for index in self.active
-            if timestamp_s - self.histories[index][-1].timestamp_s <= self.max_gap_s
-        }
+    def _match(
+        self,
+        timestamp_s: float,
+        detections: list[Point],
+        tracks: set[int],
+        distance_gate: float,
+    ) -> tuple[set[int], set[int]]:
         candidates = []
-        for index in self.active:
+        for index in tracks:
             predicted = self._predict(self.histories[index], timestamp_s)
             for detection_index, position in enumerate(detections):
                 distance = dist(predicted, position)
-                if distance <= self.max_distance_px:
+                if distance <= distance_gate:
                     candidates.append((distance, index, detection_index))
 
         matched_tracks = set()
@@ -45,6 +53,31 @@ class PointTracker:
             self.histories[index].append(Observation(timestamp_s, detections[detection_index]))
             matched_tracks.add(index)
             matched_detections.add(detection_index)
+        return matched_tracks, matched_detections
+
+    def update(
+        self,
+        timestamp_s: float,
+        detections: list[Point],
+        *,
+        weak_detections: list[Point] | None = None,
+    ) -> None:
+        self.active = {
+            index
+            for index in self.active
+            if timestamp_s - self.histories[index][-1].timestamp_s <= self.max_gap_s
+        }
+        matched_tracks, matched_detections = self._match(
+            timestamp_s, detections, self.active, self.max_distance_px
+        )
+
+        if weak_detections:
+            self._match(
+                timestamp_s,
+                weak_detections,
+                self.active - matched_tracks,
+                self.max_distance_px / 2,
+            )
 
         for detection_index, position in enumerate(detections):
             if detection_index not in matched_detections:

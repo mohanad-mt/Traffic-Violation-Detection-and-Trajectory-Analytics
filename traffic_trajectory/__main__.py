@@ -19,6 +19,18 @@ def main() -> None:
     parser.add_argument(
         "--confidence", type=float, default=0.35, help="YOLOX confidence threshold"
     )
+    parser.add_argument(
+        "--continuation-confidence",
+        type=float,
+        help="Lower YOLOX cutoff for extending existing tracks",
+    )
+    parser.add_argument(
+        "--detection-roi",
+        nargs=4,
+        type=int,
+        metavar=("LEFT", "TOP", "RIGHT", "BOTTOM"),
+        help="Run YOLOX on a rectangle in video pixels",
+    )
     parser.add_argument("--min-blob-area-px", type=int, default=100, help="Foreground area cutoff")
     parser.add_argument(
         "--track-distance-px", type=float, default=24, help="Tracker distance gate"
@@ -27,6 +39,13 @@ def main() -> None:
         "--include-tracks", action="store_true", help="Include trajectory histories"
     )
     args = parser.parse_args()
+    if args.continuation_confidence is not None:
+        if args.model is None:
+            parser.error("--continuation-confidence requires --model")
+        if not 0 < args.continuation_confidence <= args.confidence:
+            parser.error("--continuation-confidence must be positive and at most --confidence")
+    if args.detection_roi is not None and args.model is None:
+        parser.error("--detection-roi requires --model")
 
     try:
         if args.scenario == "-":
@@ -58,7 +77,10 @@ def main() -> None:
                 raise ValueError("video mode requires requirements-video.txt") from error
             try:
                 if args.model is not None:
-                    detect = YoloXDetector(args.model, args.confidence)
+                    roi = tuple(args.detection_roi) if args.detection_roi is not None else None
+                    detect = YoloXDetector(
+                        args.model, args.confidence, args.continuation_confidence, roi
+                    )
                 else:
                     detect = foreground_detector(args.background, args.min_blob_area_px)
                 tracks = track_video(

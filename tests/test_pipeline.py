@@ -27,6 +27,18 @@ class TrackingTests(unittest.TestCase):
         self.assertEqual([sample.timestamp_s for sample in first.observations], [0, 0.25, 0.75])
         self.assertEqual(second.observations[0].timestamp_s, 1.75)
 
+    def test_weak_detection_continues_a_track_without_starting_one(self):
+        tracker = PointTracker(max_gap_s=0.75, max_distance_px=10)
+        tracker.update(0.0, [(10, 20)], weak_detections=[(40, 20)])
+        tracker.update(0.25, [], weak_detections=[(14, 20), (40, 20)])
+        tracker.update(0.5, [(18, 20)], weak_detections=[(17, 20)])
+        tracker.update(1.5, [], weak_detections=[(22, 20)])
+        (track,) = tracker.tracks()
+
+        self.assertEqual(
+            [sample.position for sample in track.observations], [(10, 20), (14, 20), (18, 20)]
+        )
+
 
 class EvaluationTests(unittest.TestCase):
     def test_does_not_match_duplicates_or_other_lanes(self):
@@ -99,10 +111,43 @@ class VideoTests(unittest.TestCase):
             patch("traffic_trajectory.yolox.Path.is_file", return_value=True),
             patch("traffic_trajectory.yolox.cv2.dnn.readNetFromONNX", return_value=net),
         ):
-            points = YoloXDetector(Path("model.onnx"), 0.35)(frame)
+            detections = YoloXDetector(Path("model.onnx"), 0.35)(frame)
 
         blob = net.setInput.call_args.args[0]
         self.assertEqual(blob.shape, (1, 3, 640, 640))
         self.assertEqual(blob[0, :, 0, 0].tolist(), [210, 100, 30])
         self.assertEqual(blob[0, :, -1, -1].tolist(), [114, 114, 114])
-        self.assertEqual(points, [(160, 82)])
+        self.assertEqual(detections.strong, [(160, 82)])
+        self.assertEqual(detections.weak, [])
+
+    def test_yolox_separates_weak_vehicle_candidates(self):
+        import numpy as np
+
+        from traffic_trajectory.yolox import _vehicle_detections
+
+        prediction = np.zeros((1, 8400, 85), dtype=np.float32)
+        prediction[0, 20 * 80 + 40, 4:8] = [0.9, 0, 0, 0.9]
+        prediction[0, 20 * 80 + 30, 4:8] = [0.2, 0, 0, 0.9]
+        detections = _vehicle_detections(prediction, 2, 320, 160, 0.35, 0.08)
+
+        self.assertEqual(detections.strong, [(160, 82)])
+        self.assertEqual(detections.weak, [(120, 82)])
+
+    def test_yolox_crop_returns_full_frame_coordinates(self):
+        import numpy as np
+
+        from traffic_trajectory.yolox import YoloXDetector
+
+        prediction = np.zeros((1, 8400, 85), dtype=np.float32)
+        prediction[0, 20 * 80 + 40, 4:8] = [0.9, 0, 0, 0.9]
+        net = Mock()
+        net.forward.return_value = prediction
+        frame = np.zeros((320, 640, 3), dtype=np.uint8)
+        with (
+            patch("traffic_trajectory.yolox.Path.is_file", return_value=True),
+            patch("traffic_trajectory.yolox.cv2.dnn.readNetFromONNX", return_value=net),
+        ):
+            detector = YoloXDetector(Path("model.onnx"), 0.35, roi=(70, 40, 390, 200))
+            self.assertEqual(detector(frame).strong, [(230, 122)])
+            with self.assertRaisesRegex(ValueError, "detection ROI"):
+                detector(frame[:, :300])

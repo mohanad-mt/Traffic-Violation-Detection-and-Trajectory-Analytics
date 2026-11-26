@@ -131,6 +131,18 @@ class CommandLineTests(unittest.TestCase):
 
 
 class AdditionalEventTests(unittest.TestCase):
+    def test_wrong_way_tolerates_brief_jitter_and_uses_net_displacement(self):
+        payload = scenario_with_track(
+            [(0, 120, 20), (0.4, 104, 20), (0.5, 104.5, 20), (0.9, 90, 20), (1.1, 80, 20)]
+        )
+        (event,) = detect_wrong_way(parse_scenario(payload))
+
+        self.assertEqual(event.start_s, 0)
+        self.assertEqual(event.confirmed_s, 1.1)
+        self.assertEqual(event.reverse_distance_px, 40)
+        payload["thresholds"] = {"max_pause_s": 0}
+        self.assertEqual(detect_wrong_way(parse_scenario(payload)), [])
+
     def test_stop_rearms_after_motion_and_uses_anchor_radius(self):
         positions = [20, 21, 23, 20, 25, 26, 25, 24]
         payload = scenario_with_track([(0.5 * index, x, 20) for index, x in enumerate(positions)])
@@ -180,3 +192,21 @@ class AdditionalEventTests(unittest.TestCase):
         payload["stop_line"] = {"segment": [[45, 10], [55, 30]], "red_intervals_s": [[0, 1]]}
 
         self.assertEqual(detect_events(parse_scenario(payload)), [])
+
+    def test_red_light_ignores_jitter_that_never_clears_the_line_margin(self):
+        payload = scenario_with_track(
+            [(0, 46, 20), (0.2, 49, 20), (0.4, 50.5, 20), (0.6, 49.5, 20), (0.8, 50.5, 20)]
+        )
+        payload["stop_line"] = {"segment": [[50, 10], [50, 30]], "red_intervals_s": [[0, 1]]}
+
+        self.assertEqual(detect_events(parse_scenario(payload)), [])
+
+    def test_red_light_confirmation_preserves_crossing_time(self):
+        payload = scenario_with_track(
+            [(0, 46, 20), (0.5, 51, 20), (0.7, 54, 20), (0.8, 49, 20), (0.9, 53, 20)]
+        )
+        payload["stop_line"] = {"segment": [[50, 10], [50, 30]], "red_intervals_s": [[0, 0.6]]}
+        (event,) = detect_events(parse_scenario(payload))
+
+        self.assertAlmostEqual(event.start_s, 0.4)
+        self.assertEqual(event.confirmed_s, 0.7)
