@@ -1,0 +1,17 @@
+{
+  "events": [
+    {
+      "type": "red_light_crossing_candidate",
+      "lane_id": "red",
+      "start_s": 1.8,
+      "trajectory": [
+        {"timestamp_s": 1.4, "position": [330, 158]},
+        {"timestamp_s": 1.8, "position": [346, 153]},
+        {"timestamp_s": 2.0, "position": [350, 149]},
+        {"timestamp_s": 2.2, "position": [353, 147]},
+        {"timestamp_s": 2.5, "position": [355, 147]},
+        {"timestamp_s": 2.8, "position": [358, 145]}
+      ]
+    }
+  ]
+}

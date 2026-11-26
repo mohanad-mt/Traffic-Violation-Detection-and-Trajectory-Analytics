@@ -1,0 +1,1859 @@
+{
+  "id": "research-validation-2026-11-27",
+  "baseline_remote_commit": "3c854f4581e3c1ae10451cd21228842b85d90e4b",
+  "implementation_commit": "cb35d3ee0bfd6a66494e2004ae2e44b293a663c7",
+  "runtime": {
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "driver": "621.40",
+    "torch": "2.10.0+cu130",
+    "torchvision": "0.25.0+cu130",
+    "transformers": "5.17.0",
+    "onnxruntime_gpu": "1.32.0",
+    "trackers": "2.7.0",
+    "trackeval": "1.3.0",
+    "random_seeds": null,
+    "seed_note": "Fixed ordered inference and matching, no stochastic training, search or split."
+  },
+  "hypotheses": {
+    "detection": "Larger or different pretrained models improve fog localization and small-object recall.",
+    "association": "Kalman prediction and global box assignment reduce identity switches on the same inputs.",
+    "end_to_end": "The best alert setting in development transfers to unseen nighttime views.",
+    "cuda": "ONNX Runtime CUDA improves throughput with equivalent alerts for the same YOLOX export."
+  },
+  "detectors": {
+    "dev-yoloxs": {
+      "id": "dev-yoloxs",
+      "dataset": "foggy-driving",
+      "split": "test",
+      "archive_sha256": "49544ff675752efef2821fd51e80d6c8d298783617698b7f87a06f9f44c3fcac",
+      "model": "yolox",
+      "weights_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "configuration": {
+        "device": "cuda",
+        "input_color": "rgb",
+        "tile_size": null,
+        "tile_confidence": null,
+        "min_cached_score": 0.01,
+        "opencv_threads": 4
+      },
+      "environment": {
+        "python": "3.13.5",
+        "opencv": "4.13.0",
+        "pycocotools": "2.0.11",
+        "platform": "Windows-11-10.0.26300-SP0"
+      },
+      "images": 33,
+      "labels": 257,
+      "coco_class_agnostic": {
+        "map50_95": 0.32427556767427407,
+        "ap50": 0.52656634327903,
+        "ap75": 0.35815617430975477,
+        "ap_small": 0.053774863485412355,
+        "ap_medium": 0.4308017114157103,
+        "ap_large": 0.7122798428146981,
+        "ar1": 0.09494163424124515,
+        "ar10": 0.36536964980544745,
+        "ar100": 0.38482490272373543,
+        "ar_small": 0.09166666666666667,
+        "ar_medium": 0.5000000000000001,
+        "ar_large": 0.8152173913043479
+      },
+      "coco_class_aware": {
+        "map50_95": 0.11311886889886337,
+        "ap50": 0.1664120264550131,
+        "ap75": 0.12618568594829474,
+        "ap_small": 0.015681347656918622,
+        "ap_medium": 0.17928335222374261,
+        "ap_large": 0.4473669664595928,
+        "ar1": 0.10862612612612614,
+        "ar10": 0.1698873873873874,
+        "ar100": 0.1737162162162162,
+        "ar_small": 0.028125,
+        "ar_medium": 0.2295340501792115,
+        "ar_large": 0.5263403263403263
+      },
+      "operating_points": [
+        {
+          "confidence": 0.01,
+          "true_positives": 158,
+          "false_positives": 313,
+          "false_negatives": 99,
+          "precision": 0.3354564755838641,
+          "recall": 0.6147859922178989,
+          "small_labels": 108,
+          "small_matches": 29,
+          "f1": 0.4340659340659341
+        },
+        {
+          "confidence": 0.03,
+          "true_positives": 148,
+          "false_positives": 172,
+          "false_negatives": 109,
+          "precision": 0.4625,
+          "recall": 0.5758754863813229,
+          "small_labels": 108,
+          "small_matches": 22,
+          "f1": 0.512998266897747
+        },
+        {
+          "confidence": 0.08,
+          "true_positives": 137,
+          "false_positives": 89,
+          "false_negatives": 120,
+          "precision": 0.6061946902654868,
+          "recall": 0.5330739299610895,
+          "small_labels": 108,
+          "small_matches": 18,
+          "f1": 0.567287784679089
+        },
+        {
+          "confidence": 0.2,
+          "true_positives": 125,
+          "false_positives": 41,
+          "false_negatives": 132,
+          "precision": 0.7530120481927711,
+          "recall": 0.48638132295719844,
+          "small_labels": 108,
+          "small_matches": 13,
+          "f1": 0.5910165484633569
+        },
+        {
+          "confidence": 0.35,
+          "true_positives": 113,
+          "false_positives": 18,
+          "false_negatives": 144,
+          "precision": 0.8625954198473282,
+          "recall": 0.4396887159533074,
+          "small_labels": 108,
+          "small_matches": 8,
+          "f1": 0.5824742268041238
+        },
+        {
+          "confidence": 0.5,
+          "true_positives": 97,
+          "false_positives": 9,
+          "false_negatives": 160,
+          "precision": 0.9150943396226415,
+          "recall": 0.377431906614786,
+          "small_labels": 108,
+          "small_matches": 3,
+          "f1": 0.5344352617079889
+        },
+        {
+          "confidence": 0.65,
+          "true_positives": 83,
+          "false_positives": 5,
+          "false_negatives": 174,
+          "precision": 0.9431818181818182,
+          "recall": 0.3229571984435798,
+          "small_labels": 108,
+          "small_matches": 0,
+          "f1": 0.4811594202898551
+        },
+        {
+          "confidence": 0.75,
+          "true_positives": 64,
+          "false_positives": 4,
+          "false_negatives": 193,
+          "precision": 0.9411764705882353,
+          "recall": 0.2490272373540856,
+          "small_labels": 108,
+          "small_matches": 0,
+          "f1": 0.39384615384615385
+        },
+        {
+          "confidence": 0.9,
+          "true_positives": 16,
+          "false_positives": 2,
+          "false_negatives": 241,
+          "precision": 0.8888888888888888,
+          "recall": 0.0622568093385214,
+          "small_labels": 108,
+          "small_matches": 0,
+          "f1": 0.11636363636363636
+        }
+      ],
+      "mean_detector_ms": 8.917645455133453,
+      "p95_detector_ms": 9.939880002639256
+    },
+    "dev-yoloxm": {
+      "id": "dev-yoloxm",
+      "dataset": "foggy-driving",
+      "split": "test",
+      "archive_sha256": "49544ff675752efef2821fd51e80d6c8d298783617698b7f87a06f9f44c3fcac",
+      "model": "yolox",
+      "weights_sha256": "21ff6cfdeb53b013bac2249599e55f00bff3cfdfdab37ed7a4620818c1d15b3f",
+      "configuration": {
+        "device": "cuda",
+        "input_color": "bgr",
+        "tile_size": null,
+        "tile_confidence": null,
+        "min_cached_score": 0.01,
+        "opencv_threads": 4
+      },
+      "environment": {
+        "python": "3.13.5",
+        "opencv": "4.13.0",
+        "pycocotools": "2.0.11",
+        "platform": "Windows-11-10.0.26300-SP0"
+      },
+      "images": 33,
+      "labels": 257,
+      "coco_class_agnostic": {
+        "map50_95": 0.4165754944354304,
+        "ap50": 0.6174932450012374,
+        "ap75": 0.45780095145233884,
+        "ap_small": 0.10878699835850053,
+        "ap_medium": 0.5783618868894604,
+        "ap_large": 0.7686815312876097,
+        "ar1": 0.10077821011673152,
+        "ar10": 0.44396887159533077,
+        "ar100": 0.4680933852140078,
+        "ar_small": 0.14629629629629629,
+        "ar_medium": 0.6271844660194176,
+        "ar_large": 0.8717391304347826
+      },
+      "coco_class_aware": {
+        "map50_95": 0.1375836534982289,
+        "ap50": 0.2003192612641773,
+        "ap75": 0.15573154647361076,
+        "ap_small": 0.03374233289352732,
+        "ap_medium": 0.23913742156947948,
+        "ap_large": 0.4495436681494333,
+        "ar1": 0.13427364864864866,
+        "ar10": 0.23137950450450448,
+        "ar100": 0.23644707207207208,
+        "ar_small": 0.04618055555555555,
+        "ar_medium": 0.3145519713261649,
+        "ar_large": 0.57004662004662
+      },
+      "operating_points": [
+        {
+          "confidence": 0.01,
+          "true_positives": 173,
+          "false_positives": 237,
+          "false_negatives": 84,
+          "precision": 0.4219512195121951,
+          "recall": 0.6731517509727627,
+          "small_labels": 108,
+          "small_matches": 37,
+          "f1": 0.5187406296851574
+        },
+        {
+          "confidence": 0.03,
+          "true_positives": 166,
+          "false_positives": 138,
+          "false_negatives": 91,
+          "precision": 0.5460526315789473,
+          "recall": 0.6459143968871596,
+          "small_labels": 108,
+          "small_matches": 33,
+          "f1": 0.5918003565062389
+        },
+        {
+          "confidence": 0.08,
+          "true_positives": 162,
+          "false_positives": 80,
+          "false_negatives": 95,
+          "precision": 0.6694214876033058,
+          "recall": 0.6303501945525292,
+          "small_labels": 108,
+          "small_matches": 31,
+          "f1": 0.6492985971943888
+        },
+        {
+          "confidence": 0.2,
+          "true_positives": 149,
+          "false_positives": 34,
+          "false_negatives": 108,
+          "precision": 0.8142076502732241,
+          "recall": 0.5797665369649806,
+          "small_labels": 108,
+          "small_matches": 22,
+          "f1": 0.6772727272727272
+        },
+        {
+          "confidence": 0.35,
+          "true_positives": 137,
+          "false_positives": 17,
+          "false_negatives": 120,
+          "precision": 0.8896103896103896,
+          "recall": 0.5330739299610895,
+          "small_labels": 108,
+          "small_matches": 17,
+          "f1": 0.6666666666666666
+        },
+        {
+          "confidence": 0.5,
+          "true_positives": 122,
+          "false_positives": 6,
+          "false_negatives": 135,
+          "precision": 0.953125,
+          "recall": 0.47470817120622566,
+          "small_labels": 108,
+          "small_matches": 11,
+          "f1": 0.6337662337662338
+        },
+        {
+          "confidence": 0.65,
+          "true_positives": 110,
+          "false_positives": 3,
+          "false_negatives": 147,
+          "precision": 0.9734513274336283,
+          "recall": 0.4280155642023346,
+          "small_labels": 108,
+          "small_matches": 8,
+          "f1": 0.5945945945945946
+        },
+        {
+          "confidence": 0.75,
+          "true_positives": 85,
+          "false_positives": 3,
+          "false_negatives": 172,
+          "precision": 0.9659090909090909,
+          "recall": 0.33073929961089493,
+          "small_labels": 108,
+          "small_matches": 0,
+          "f1": 0.4927536231884058
+        },
+        {
+          "confidence": 0.9,
+          "true_positives": 33,
+          "false_positives": 2,
+          "false_negatives": 224,
+          "precision": 0.9428571428571428,
+          "recall": 0.12840466926070038,
+          "small_labels": 108,
+          "small_matches": 0,
+          "f1": 0.22602739726027396
+        }
+      ],
+      "mean_detector_ms": 13.455669698129041,
+      "p95_detector_ms": 14.883120002923533
+    },
+    "dev-rtdetr18": {
+      "id": "dev-rtdetr18",
+      "dataset": "foggy-driving",
+      "split": "test",
+      "archive_sha256": "49544ff675752efef2821fd51e80d6c8d298783617698b7f87a06f9f44c3fcac",
+      "model": "rtdetr",
+      "weights_sha256": "fe87a5a30f5daf298d10794c7682a63b6107986f97d6a770ba948d89e4340093",
+      "configuration": {
+        "device": "cuda",
+        "input_color": "rgb",
+        "tile_size": null,
+        "tile_confidence": null,
+        "min_cached_score": 0.01,
+        "opencv_threads": 4
+      },
+      "environment": {
+        "python": "3.13.5",
+        "opencv": "4.13.0",
+        "pycocotools": "2.0.11",
+        "platform": "Windows-11-10.0.26300-SP0"
+      },
+      "images": 33,
+      "labels": 257,
+      "coco_class_agnostic": {
+        "map50_95": 0.410353199536073,
+        "ap50": 0.6355059821706297,
+        "ap75": 0.45231099379289347,
+        "ap_small": 0.12343774882852526,
+        "ap_medium": 0.5446984856591166,
+        "ap_large": 0.7745977214684457,
+        "ar1": 0.09805447470817122,
+        "ar10": 0.43385214007782097,
+        "ar100": 0.5400778210116731,
+        "ar_small": 0.27037037037037037,
+        "ar_medium": 0.6747572815533982,
+        "ar_large": 0.8717391304347826
+      },
+      "coco_class_aware": {
+        "map50_95": 0.16392472731492685,
+        "ap50": 0.23907789837196392,
+        "ap75": 0.18112875779720292,
+        "ap_small": 0.043263747111123595,
+        "ap_medium": 0.22889330005482095,
+        "ap_large": 0.5776959477938619,
+        "ar1": 0.12504504504504504,
+        "ar10": 0.33818693693693697,
+        "ar100": 0.39282657657657655,
+        "ar_small": 0.1517361111111111,
+        "ar_medium": 0.5353405017921148,
+        "ar_large": 0.8645687645687646
+      },
+      "operating_points": [
+        {
+          "confidence": 0.01,
+          "true_positives": 216,
+          "false_positives": 3466,
+          "false_negatives": 41,
+          "precision": 0.05866376969038566,
+          "recall": 0.8404669260700389,
+          "small_labels": 108,
+          "small_matches": 73,
+          "f1": 0.10967250571210967
+        },
+        {
+          "confidence": 0.03,
+          "true_positives": 216,
+          "false_positives": 3393,
+          "false_negatives": 41,
+          "precision": 0.059850374064837904,
+          "recall": 0.8404669260700389,
+          "small_labels": 108,
+          "small_matches": 73,
+          "f1": 0.11174340403517848
+        },
+        {
+          "confidence": 0.08,
+          "true_positives": 208,
+          "false_positives": 1676,
+          "false_negatives": 49,
+          "precision": 0.11040339702760085,
+          "recall": 0.8093385214007782,
+          "small_labels": 108,
+          "small_matches": 70,
+          "f1": 0.19430172816440916
+        },
+        {
+          "confidence": 0.2,
+          "true_positives": 177,
+          "false_positives": 290,
+          "false_negatives": 80,
+          "precision": 0.37901498929336186,
+          "recall": 0.688715953307393,
+          "small_labels": 108,
+          "small_matches": 45,
+          "f1": 0.4889502762430939
+        },
+        {
+          "confidence": 0.35,
+          "true_positives": 149,
+          "false_positives": 76,
+          "false_negatives": 108,
+          "precision": 0.6622222222222223,
+          "recall": 0.5797665369649806,
+          "small_labels": 108,
+          "small_matches": 25,
+          "f1": 0.6182572614107884
+        },
+        {
+          "confidence": 0.5,
+          "true_positives": 125,
+          "false_positives": 17,
+          "false_negatives": 132,
+          "precision": 0.8802816901408451,
+          "recall": 0.48638132295719844,
+          "small_labels": 108,
+          "small_matches": 12,
+          "f1": 0.6265664160401002
+        },
+        {
+          "confidence": 0.65,
+          "true_positives": 109,
+          "false_positives": 5,
+          "false_negatives": 148,
+          "precision": 0.956140350877193,
+          "recall": 0.42412451361867703,
+          "small_labels": 108,
+          "small_matches": 9,
+          "f1": 0.5876010781671159
+        },
+        {
+          "confidence": 0.75,
+          "true_positives": 87,
+          "false_positives": 2,
+          "false_negatives": 170,
+          "precision": 0.9775280898876404,
+          "recall": 0.33852140077821014,
+          "small_labels": 108,
+          "small_matches": 6,
+          "f1": 0.5028901734104047
+        },
+        {
+          "confidence": 0.9,
+          "true_positives": 24,
+          "false_positives": 2,
+          "false_negatives": 233,
+          "precision": 0.9230769230769231,
+          "recall": 0.0933852140077821,
+          "small_labels": 108,
+          "small_matches": 0,
+          "f1": 0.1696113074204947
+        }
+      ],
+      "mean_detector_ms": 21.514178787280496,
+      "p95_detector_ms": 24.1745000006631
+    },
+    "dawn-yoloxs": {
+      "id": "dawn-yoloxs",
+      "dataset": "dawn-fog",
+      "split": "fog (all 300)",
+      "archive_sha256": "09f4f8987e030b8da9e76eb73ab00b64fb628cd43df42e460bc26b9a0912c7c2",
+      "model": "yolox",
+      "weights_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "configuration": {
+        "device": "cuda",
+        "input_color": "rgb",
+        "tile_size": null,
+        "tile_confidence": null,
+        "min_cached_score": 0.01,
+        "opencv_threads": 4
+      },
+      "environment": {
+        "python": "3.13.5",
+        "opencv": "4.13.0",
+        "pycocotools": "2.0.11",
+        "platform": "Windows-11-10.0.26300-SP0"
+      },
+      "images": 300,
+      "labels": 1818,
+      "coco_class_agnostic": {
+        "map50_95": 0.47116812123403246,
+        "ap50": 0.7299056346556755,
+        "ap75": 0.4935638353327179,
+        "ap_small": 0.22541832695013142,
+        "ap_medium": 0.40475350458248177,
+        "ap_large": 0.6493215427598342,
+        "ar1": 0.1257975797579758,
+        "ar10": 0.43921892189218925,
+        "ar100": 0.5288228822882288,
+        "ar_small": 0.32666666666666666,
+        "ar_medium": 0.46292517006802714,
+        "ar_large": 0.698048048048048
+      },
+      "coco_class_aware": {
+        "map50_95": 0.3228128385065458,
+        "ap50": 0.5119638689895714,
+        "ap75": 0.3331797551580387,
+        "ap_small": 0.07401075749203172,
+        "ap_medium": 0.25595011340501234,
+        "ap_large": 0.47181803840009673,
+        "ar1": 0.21741909577856858,
+        "ar10": 0.38043044361686346,
+        "ar100": 0.39861825898620745,
+        "ar_small": 0.13379446640316206,
+        "ar_medium": 0.30754503740001976,
+        "ar_large": 0.5653110161762696
+      },
+      "operating_points": [
+        {
+          "confidence": 0.01,
+          "true_positives": 1436,
+          "false_positives": 1992,
+          "false_negatives": 382,
+          "precision": 0.41890315052508753,
+          "recall": 0.7898789878987899,
+          "small_labels": 270,
+          "small_matches": 183,
+          "f1": 0.5474647350362181
+        },
+        {
+          "confidence": 0.03,
+          "true_positives": 1380,
+          "false_positives": 967,
+          "false_negatives": 438,
+          "precision": 0.587984661269706,
+          "recall": 0.759075907590759,
+          "small_labels": 270,
+          "small_matches": 166,
+          "f1": 0.6626650660264105
+        },
+        {
+          "confidence": 0.08,
+          "true_positives": 1315,
+          "false_positives": 435,
+          "false_negatives": 503,
+          "precision": 0.7514285714285714,
+          "recall": 0.7233223322332233,
+          "small_labels": 270,
+          "small_matches": 147,
+          "f1": 0.7371076233183856
+        },
+        {
+          "confidence": 0.2,
+          "true_positives": 1201,
+          "false_positives": 188,
+          "false_negatives": 617,
+          "precision": 0.8646508279337654,
+          "recall": 0.6606160616061606,
+          "small_labels": 270,
+          "small_matches": 119,
+          "f1": 0.7489865918303711
+        },
+        {
+          "confidence": 0.35,
+          "true_positives": 1073,
+          "false_positives": 91,
+          "false_negatives": 745,
+          "precision": 0.9218213058419243,
+          "recall": 0.5902090209020903,
+          "small_labels": 270,
+          "small_matches": 89,
+          "f1": 0.7196512407780014
+        },
+        {
+          "confidence": 0.5,
+          "true_positives": 914,
+          "false_positives": 46,
+          "false_negatives": 904,
+          "precision": 0.9520833333333333,
+          "recall": 0.5027502750275028,
+          "small_labels": 270,
+          "small_matches": 59,
+          "f1": 0.6580273578113751
+        },
+        {
+          "confidence": 0.65,
+          "true_positives": 713,
+          "false_positives": 9,
+          "false_negatives": 1105,
+          "precision": 0.9875346260387812,
+          "recall": 0.3921892189218922,
+          "small_labels": 270,
+          "small_matches": 31,
+          "f1": 0.5614173228346456
+        },
+        {
+          "confidence": 0.75,
+          "true_positives": 548,
+          "false_positives": 3,
+          "false_negatives": 1270,
+          "precision": 0.9945553539019963,
+          "recall": 0.30143014301430143,
+          "small_labels": 270,
+          "small_matches": 10,
+          "f1": 0.4626424651751794
+        },
+        {
+          "confidence": 0.9,
+          "true_positives": 140,
+          "false_positives": 0,
+          "false_negatives": 1678,
+          "precision": 1.0,
+          "recall": 0.07700770077007701,
+          "small_labels": 270,
+          "small_matches": 0,
+          "f1": 0.14300306435137897
+        }
+      ],
+      "mean_detector_ms": 7.863639333760754,
+      "p95_detector_ms": 9.75570499067544
+    },
+    "dawn-yoloxm": {
+      "id": "dawn-yoloxm",
+      "dataset": "dawn-fog",
+      "split": "fog (all 300)",
+      "archive_sha256": "09f4f8987e030b8da9e76eb73ab00b64fb628cd43df42e460bc26b9a0912c7c2",
+      "model": "yolox",
+      "weights_sha256": "21ff6cfdeb53b013bac2249599e55f00bff3cfdfdab37ed7a4620818c1d15b3f",
+      "configuration": {
+        "device": "cuda",
+        "input_color": "bgr",
+        "tile_size": null,
+        "tile_confidence": null,
+        "min_cached_score": 0.01,
+        "opencv_threads": 4
+      },
+      "environment": {
+        "python": "3.13.5",
+        "opencv": "4.13.0",
+        "pycocotools": "2.0.11",
+        "platform": "Windows-11-10.0.26300-SP0"
+      },
+      "images": 300,
+      "labels": 1818,
+      "coco_class_agnostic": {
+        "map50_95": 0.5418093054174977,
+        "ap50": 0.8292267750386154,
+        "ap75": 0.5659561171199555,
+        "ap_small": 0.2665589663466646,
+        "ap_medium": 0.4784119012924816,
+        "ap_large": 0.7121704852963254,
+        "ar1": 0.13536853685368536,
+        "ar10": 0.4892739273927392,
+        "ar100": 0.5965346534653465,
+        "ar_small": 0.39925925925925926,
+        "ar_medium": 0.5390022675736962,
+        "ar_large": 0.7527027027027027
+      },
+      "coco_class_aware": {
+        "map50_95": 0.420597988146831,
+        "ap50": 0.6737673112672636,
+        "ap75": 0.43340927940704715,
+        "ap_small": 0.20018307775960018,
+        "ap_medium": 0.33844116925844114,
+        "ap_large": 0.5582585433261328,
+        "ar1": 0.2682269935668491,
+        "ar10": 0.4652252374041333,
+        "ar100": 0.4888611874413572,
+        "ar_small": 0.2618247694334651,
+        "ar_medium": 0.4098588936136072,
+        "ar_large": 0.6218010749073993
+      },
+      "operating_points": [
+        {
+          "confidence": 0.01,
+          "true_positives": 1603,
+          "false_positives": 1697,
+          "false_negatives": 215,
+          "precision": 0.4857575757575758,
+          "recall": 0.8817381738173817,
+          "small_labels": 270,
+          "small_matches": 220,
+          "f1": 0.6264165689722548
+        },
+        {
+          "confidence": 0.03,
+          "true_positives": 1557,
+          "false_positives": 879,
+          "false_negatives": 261,
+          "precision": 0.6391625615763546,
+          "recall": 0.8564356435643564,
+          "small_labels": 270,
+          "small_matches": 204,
+          "f1": 0.7320169252468265
+        },
+        {
+          "confidence": 0.08,
+          "true_positives": 1487,
+          "false_positives": 466,
+          "false_negatives": 331,
+          "precision": 0.7613927291346646,
+          "recall": 0.817931793179318,
+          "small_labels": 270,
+          "small_matches": 179,
+          "f1": 0.788650225404402
+        },
+        {
+          "confidence": 0.2,
+          "true_positives": 1391,
+          "false_positives": 217,
+          "false_negatives": 427,
+          "precision": 0.8650497512437811,
+          "recall": 0.7651265126512651,
+          "small_labels": 270,
+          "small_matches": 139,
+          "f1": 0.812025685931115
+        },
+        {
+          "confidence": 0.35,
+          "true_positives": 1279,
+          "false_positives": 103,
+          "false_negatives": 539,
+          "precision": 0.9254703328509407,
+          "recall": 0.7035203520352035,
+          "small_labels": 270,
+          "small_matches": 99,
+          "f1": 0.799375
+        },
+        {
+          "confidence": 0.5,
+          "true_positives": 1159,
+          "false_positives": 64,
+          "false_negatives": 659,
+          "precision": 0.9476696647587899,
+          "recall": 0.6375137513751375,
+          "small_labels": 270,
+          "small_matches": 66,
+          "f1": 0.7622492601118054
+        },
+        {
+          "confidence": 0.65,
+          "true_positives": 975,
+          "false_positives": 30,
+          "false_negatives": 843,
+          "precision": 0.9701492537313433,
+          "recall": 0.5363036303630363,
+          "small_labels": 270,
+          "small_matches": 43,
+          "f1": 0.6907545164718385
+        },
+        {
+          "confidence": 0.75,
+          "true_positives": 797,
+          "false_positives": 17,
+          "false_negatives": 1021,
+          "precision": 0.9791154791154791,
+          "recall": 0.4383938393839384,
+          "small_labels": 270,
+          "small_matches": 23,
+          "f1": 0.6056231003039514
+        },
+        {
+          "confidence": 0.9,
+          "true_positives": 266,
+          "false_positives": 0,
+          "false_negatives": 1552,
+          "precision": 1.0,
+          "recall": 0.14631463146314633,
+          "small_labels": 270,
+          "small_matches": 3,
+          "f1": 0.255278310940499
+        }
+      ],
+      "mean_detector_ms": 12.393052334179325,
+      "p95_detector_ms": 13.78415000071982
+    },
+    "dawn-rtdetr18": {
+      "id": "dawn-rtdetr18",
+      "dataset": "dawn-fog",
+      "split": "fog (all 300)",
+      "archive_sha256": "09f4f8987e030b8da9e76eb73ab00b64fb628cd43df42e460bc26b9a0912c7c2",
+      "model": "rtdetr",
+      "weights_sha256": "fe87a5a30f5daf298d10794c7682a63b6107986f97d6a770ba948d89e4340093",
+      "configuration": {
+        "device": "cuda",
+        "input_color": "rgb",
+        "tile_size": null,
+        "tile_confidence": null,
+        "min_cached_score": 0.01,
+        "opencv_threads": 4
+      },
+      "environment": {
+        "python": "3.13.5",
+        "opencv": "4.13.0",
+        "pycocotools": "2.0.11",
+        "platform": "Windows-11-10.0.26300-SP0"
+      },
+      "images": 300,
+      "labels": 1818,
+      "coco_class_agnostic": {
+        "map50_95": 0.49258782296442605,
+        "ap50": 0.7159332744205457,
+        "ap75": 0.5260294658098417,
+        "ap_small": 0.21814693825634224,
+        "ap_medium": 0.44204942812052817,
+        "ap_large": 0.6647914404542145,
+        "ar1": 0.1301980198019802,
+        "ar10": 0.4693069306930693,
+        "ar100": 0.6255225522552255,
+        "ar_small": 0.3881481481481482,
+        "ar_medium": 0.5763038548752835,
+        "ar_large": 0.7869369369369369
+      },
+      "coco_class_aware": {
+        "map50_95": 0.2783301924385158,
+        "ap50": 0.3925629635577145,
+        "ap75": 0.2995536657037946,
+        "ap_small": 0.12291702381682383,
+        "ap_medium": 0.22763114771060763,
+        "ap_large": 0.36704397182823917,
+        "ar1": 0.1782380880535092,
+        "ar10": 0.39401204563804365,
+        "ar100": 0.47477077287115854,
+        "ar_small": 0.36465744400527006,
+        "ar_medium": 0.42181366952206967,
+        "ar_large": 0.5538706581875139
+      },
+      "operating_points": [
+        {
+          "confidence": 0.01,
+          "true_positives": 1645,
+          "false_positives": 39707,
+          "false_negatives": 173,
+          "precision": 0.03978042174501838,
+          "recall": 0.9048404840484049,
+          "small_labels": 270,
+          "small_matches": 223,
+          "f1": 0.07621033124855224
+        },
+        {
+          "confidence": 0.03,
+          "true_positives": 1645,
+          "false_positives": 35253,
+          "false_negatives": 173,
+          "precision": 0.04458236218765245,
+          "recall": 0.9048404840484049,
+          "small_labels": 270,
+          "small_matches": 223,
+          "f1": 0.08497778696146296
+        },
+        {
+          "confidence": 0.08,
+          "true_positives": 1577,
+          "false_positives": 11637,
+          "false_negatives": 241,
+          "precision": 0.11934312093234448,
+          "recall": 0.8674367436743674,
+          "small_labels": 270,
+          "small_matches": 205,
+          "f1": 0.2098190526875998
+        },
+        {
+          "confidence": 0.2,
+          "true_positives": 1388,
+          "false_positives": 2043,
+          "false_negatives": 430,
+          "precision": 0.40454677936461675,
+          "recall": 0.7634763476347635,
+          "small_labels": 270,
+          "small_matches": 151,
+          "f1": 0.528862640502953
+        },
+        {
+          "confidence": 0.35,
+          "true_positives": 1185,
+          "false_positives": 412,
+          "false_negatives": 633,
+          "precision": 0.7420162805259862,
+          "recall": 0.6518151815181518,
+          "small_labels": 270,
+          "small_matches": 91,
+          "f1": 0.6939970717423133
+        },
+        {
+          "confidence": 0.5,
+          "true_positives": 987,
+          "false_positives": 62,
+          "false_negatives": 831,
+          "precision": 0.9408960915157293,
+          "recall": 0.5429042904290429,
+          "small_labels": 270,
+          "small_matches": 57,
+          "f1": 0.6885245901639344
+        },
+        {
+          "confidence": 0.65,
+          "true_positives": 742,
+          "false_positives": 15,
+          "false_negatives": 1076,
+          "precision": 0.9801849405548216,
+          "recall": 0.4081408140814081,
+          "small_labels": 270,
+          "small_matches": 28,
+          "f1": 0.5763106796116505
+        },
+        {
+          "confidence": 0.75,
+          "true_positives": 578,
+          "false_positives": 6,
+          "false_negatives": 1240,
+          "precision": 0.9897260273972602,
+          "recall": 0.3179317931793179,
+          "small_labels": 270,
+          "small_matches": 10,
+          "f1": 0.48126561199000834
+        },
+        {
+          "confidence": 0.9,
+          "true_positives": 151,
+          "false_positives": 0,
+          "false_negatives": 1667,
+          "precision": 1.0,
+          "recall": 0.08305830583058306,
+          "small_labels": 270,
+          "small_matches": 1,
+          "f1": 0.15337734890807517
+        }
+      ],
+      "mean_detector_ms": 20.22248100033418,
+      "p95_detector_ms": 27.572949996829266
+    },
+    "dawn-yoloxs-tiles": {
+      "id": "dawn-yoloxs-tiles",
+      "dataset": "dawn-fog",
+      "split": "fog (all 300)",
+      "archive_sha256": "09f4f8987e030b8da9e76eb73ab00b64fb628cd43df42e460bc26b9a0912c7c2",
+      "model": "yolox",
+      "weights_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+      "configuration": {
+        "device": "cuda",
+        "input_color": "rgb",
+        "tile_size": 640,
+        "tile_confidence": 0.75,
+        "min_cached_score": 0.01,
+        "opencv_threads": 4
+      },
+      "environment": {
+        "python": "3.13.5",
+        "opencv": "4.13.0",
+        "pycocotools": "2.0.11",
+        "platform": "Windows-11-10.0.26300-SP0"
+      },
+      "images": 300,
+      "labels": 1818,
+      "coco_class_agnostic": {
+        "map50_95": 0.46428355764259027,
+        "ap50": 0.7315793469905572,
+        "ap75": 0.4741502241813655,
+        "ap_small": 0.22521360473023705,
+        "ap_medium": 0.4076710899414573,
+        "ap_large": 0.6281027252687467,
+        "ar1": 0.123982398239824,
+        "ar10": 0.43828382838283836,
+        "ar100": 0.5282178217821782,
+        "ar_small": 0.3262962962962963,
+        "ar_medium": 0.4679138321995465,
+        "ar_large": 0.68993993993994
+      },
+      "coco_class_aware": {
+        "map50_95": 0.3139240874804757,
+        "ap50": 0.5158211528871325,
+        "ap75": 0.2950538287663063,
+        "ap_small": 0.0739796692506522,
+        "ap_medium": 0.26355738495776676,
+        "ap_large": 0.43970149442818834,
+        "ar1": 0.21383649458494122,
+        "ar10": 0.37924093869630005,
+        "ar100": 0.3974128304987651,
+        "ar_small": 0.13369565217391305,
+        "ar_medium": 0.31674568912313616,
+        "ar_large": 0.5476307557515501
+      },
+      "operating_points": [
+        {
+          "confidence": 0.01,
+          "true_positives": 1437,
+          "false_positives": 1993,
+          "false_negatives": 381,
+          "precision": 0.41895043731778425,
+          "recall": 0.7904290429042904,
+          "small_labels": 270,
+          "small_matches": 183,
+          "f1": 0.5476371951219512
+        },
+        {
+          "confidence": 0.03,
+          "true_positives": 1381,
+          "false_positives": 970,
+          "false_negatives": 437,
+          "precision": 0.5874096129306678,
+          "recall": 0.7596259625962596,
+          "small_labels": 270,
+          "small_matches": 166,
+          "f1": 0.6625089949628208
+        },
+        {
+          "confidence": 0.08,
+          "true_positives": 1316,
+          "false_positives": 439,
+          "false_negatives": 502,
+          "precision": 0.7498575498575498,
+          "recall": 0.7238723872387238,
+          "small_labels": 270,
+          "small_matches": 147,
+          "f1": 0.7366358802127064
+        },
+        {
+          "confidence": 0.2,
+          "true_positives": 1205,
+          "false_positives": 192,
+          "false_negatives": 613,
+          "precision": 0.8625626342161775,
+          "recall": 0.6628162816281629,
+          "small_labels": 270,
+          "small_matches": 119,
+          "f1": 0.749611197511664
+        },
+        {
+          "confidence": 0.35,
+          "true_positives": 1081,
+          "false_positives": 95,
+          "false_negatives": 737,
+          "precision": 0.91921768707483,
+          "recall": 0.5946094609460946,
+          "small_labels": 270,
+          "small_matches": 89,
+          "f1": 0.7221108884435538
+        },
+        {
+          "confidence": 0.5,
+          "true_positives": 935,
+          "false_positives": 51,
+          "false_negatives": 883,
+          "precision": 0.9482758620689655,
+          "recall": 0.5143014301430143,
+          "small_labels": 270,
+          "small_matches": 59,
+          "f1": 0.666904422253923
+        },
+        {
+          "confidence": 0.65,
+          "true_positives": 763,
+          "false_positives": 19,
+          "false_negatives": 1055,
+          "precision": 0.9757033248081841,
+          "recall": 0.4196919691969197,
+          "small_labels": 270,
+          "small_matches": 31,
+          "f1": 0.5869230769230769
+        },
+        {
+          "confidence": 0.75,
+          "true_positives": 663,
+          "false_positives": 16,
+          "false_negatives": 1155,
+          "precision": 0.9764359351988218,
+          "recall": 0.36468646864686466,
+          "small_labels": 270,
+          "small_matches": 12,
+          "f1": 0.5310372446936323
+        },
+        {
+          "confidence": 0.9,
+          "true_positives": 182,
+          "false_positives": 0,
+          "false_negatives": 1636,
+          "precision": 1.0,
+          "recall": 0.1001100110011001,
+          "small_labels": 270,
+          "small_matches": 0,
+          "f1": 0.182
+        }
+      ],
+      "mean_detector_ms": 47.055197333053606,
+      "p95_detector_ms": 70.33918499873835
+    }
+  },
+  "tracking": {
+    "archive_sha256": "acf7d560f0eb27e45325c35feea3e64d0ad1ba324db62ca0656c8ecf56bffb00",
+    "split": "published test sequences, no tuning",
+    "configuration": {
+      "max_gap_s": 0.75,
+      "max_distance_px": 24,
+      "confidence": 0.35
+    },
+    "detection_scores": "Retain authors' detections and treat them all as strong",
+    "sequences": {
+      "M-30": {
+        "frames": 7520,
+        "fps": 30.0,
+        "trackers": {
+          "point": {
+            "HOTA": 0.31507987090543155,
+            "DetA": 0.29464433435643417,
+            "AssA": 0.3384889702373807,
+            "IDF1": 0.5553313088254711,
+            "MOTA": 0.3543439791017106,
+            "identity_switches": 137,
+            "fragments": 905,
+            "mostly_tracked": 4,
+            "mostly_lost": 37,
+            "reference_ids": 270,
+            "predicted_ids": 564,
+            "mean_tracker_ms": 0.007073989361239736
+          },
+          "bytetrack": {
+            "HOTA": 0.3196532304034196,
+            "DetA": 0.29255709913452005,
+            "AssA": 0.35061474758758054,
+            "IDF1": 0.568391077361177,
+            "MOTA": 0.3614505210527794,
+            "identity_switches": 2,
+            "fragments": 875,
+            "mostly_tracked": 3,
+            "mostly_lost": 37,
+            "reference_ids": 270,
+            "predicted_ids": 262,
+            "mean_tracker_ms": 0.16585631648845167
+          },
+          "ocsort": {
+            "HOTA": 0.3013804315618997,
+            "DetA": 0.2720923384689609,
+            "AssA": 0.33515920211725914,
+            "IDF1": 0.5459912807178745,
+            "MOTA": 0.34855762478582064,
+            "identity_switches": 3,
+            "fragments": 589,
+            "mostly_tracked": 3,
+            "mostly_lost": 44,
+            "reference_ids": 270,
+            "predicted_ids": 254,
+            "mean_tracker_ms": 0.2424958510636451
+          }
+        }
+      },
+      "Urban1": {
+        "frames": 23435,
+        "fps": 25.0,
+        "trackers": {
+          "point": {
+            "HOTA": 0.19926241334630979,
+            "DetA": 0.34977420142434434,
+            "AssA": 0.11473455717256202,
+            "IDF1": 0.18730825850966995,
+            "MOTA": 0.41822324225621094,
+            "identity_switches": 369,
+            "fragments": 1164,
+            "mostly_tracked": 4,
+            "mostly_lost": 169,
+            "reference_ids": 243,
+            "predicted_ids": 847,
+            "mean_tracker_ms": 0.0074255984637279044
+          },
+          "bytetrack": {
+            "HOTA": 0.24639170462476526,
+            "DetA": 0.34652170659047826,
+            "AssA": 0.17629538837775818,
+            "IDF1": 0.24401631912964641,
+            "MOTA": 0.42199252843717017,
+            "identity_switches": 117,
+            "fragments": 960,
+            "mostly_tracked": 4,
+            "mostly_lost": 178,
+            "reference_ids": 243,
+            "predicted_ids": 405,
+            "mean_tracker_ms": 0.10285321527647229
+          },
+          "ocsort": {
+            "HOTA": 0.24642472695986783,
+            "DetA": 0.33184968519132757,
+            "AssA": 0.1841078467234837,
+            "IDF1": 0.23021599478633276,
+            "MOTA": 0.40735094567202185,
+            "identity_switches": 65,
+            "fragments": 368,
+            "mostly_tracked": 4,
+            "mostly_lost": 203,
+            "reference_ids": 243,
+            "predicted_ids": 286,
+            "mean_tracker_ms": 0.15537466183096646
+          }
+        }
+      }
+    }
+  },
+  "development_alerts": {
+    "columns": [
+      "tracker",
+      "track_start",
+      "continuation",
+      "track_ids",
+      "observations",
+      "replay_ms_per_frame",
+      "true_positives",
+      "false_positives",
+      "false_negatives",
+      "duplicates",
+      "mean_confirmation_delay_s",
+      "mean_abs_onset_error_s"
+    ],
+    "models": {
+      "rtdetr-r18": {
+        "detector": "rtdetr",
+        "device": "cuda",
+        "split": "development",
+        "cases": {
+          "fog": {
+            "video_sha256": "1f563454a0b974445a3aadc06231a55fd88dd9e4727b3403fdef39773f440a39",
+            "frames": 60,
+            "fps": 7.5,
+            "mean_detector_ms": 17.964464999871172,
+            "runs": [
+              ["point", 0.08, 0.08, 216, 1909, 0.2572516665774553, 0, 0, 1, 0, null, null],
+              ["point", 0.08, 0.03, 186, 3093, 0.647220000003775, 0, 1, 1, 0, null, null],
+              ["point", 0.2, 0.2, 35, 255, 0.023275000179031242, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.03, 28, 671, 0.17823166660188386, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.35, 10, 57, 0.009563333393695453, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.03, 10, 172, 0.10081666672097829, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 166, 1661, 6.081981666648062, 0, 1, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.03, 144, 3334, 1.6364966667121432, 0, 2, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 25, 210, 0.18220833347489437, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 27, 672, 0.4714750000857748, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 5, 44, 0.09045666665770113, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 10, 169, 0.25375166660523973, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.08, 118, 993, 1.8085683332174085, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.03, 118, 993, 2.2736533333954867, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.2, 16, 123, 0.40861333327484317, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.03, 16, 123, 0.4114516666353059, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.35, 5, 29, 0.15999333336367272, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.03, 5, 29, 0.23928999992980002, 0, 0, 1, 0, null, null]
+            ]
+          },
+          "shadow": {
+            "video_sha256": "8ab378fd0f0d728a5a77fc6c39bae8d2ffcbb7540916a76aba367597b4134d01",
+            "frames": 53,
+            "fps": 7.5,
+            "mean_detector_ms": 16.37032264288963,
+            "runs": [
+              ["point", 0.08, 0.08, 353, 3121, 0.784645282898432, 0, 0, 1, 0, null, null],
+              ["point", 0.08, 0.03, 301, 4679, 1.3551566036492761, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.2, 83, 695, 0.06452830176677485, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.03, 66, 1438, 0.30614716964027017, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.35, 27, 178, 0.016247169971290342, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.03, 22, 454, 0.15038490555697243, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 264, 2680, 1.7521094340273127, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.03, 262, 5097, 4.4771132074770925, 0, 1, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 48, 590, 0.5032867926309096, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 51, 1583, 0.9939754716744471, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 21, 142, 0.1742320754653159, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 17, 447, 0.4115698113378559, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.08, 213, 1705, 3.16254716978259, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.03, 213, 1705, 3.168107547197614, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.2, 42, 371, 0.8276094339858249, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.03, 42, 371, 0.8932660377193418, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.35, 13, 84, 0.3270622639903658, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.03, 13, 84, 0.40335849065878343, 0, 0, 1, 0, null, null]
+            ]
+          },
+          "highway-stop": {
+            "video_sha256": "1e65102ddc8909f5c0386b167f41d8eb1ab6ad5c3f250a91b7ed55144bf20643",
+            "frames": 158,
+            "fps": 7.5,
+            "mean_detector_ms": 16.297915822673808,
+            "runs": [
+              ["point", 0.08, 0.08, 768, 10593, 0.6219227848017493, 0, 3, 1, 0, null, null],
+              ["point", 0.08, 0.03, 603, 15386, 1.2805512657755973, 0, 2, 1, 0, null, null],
+              ["point", 0.2, 0.2, 155, 1354, 0.03670189867482839, 0, 1, 1, 0, null, null],
+              ["point", 0.2, 0.03, 110, 3139, 0.2416430379756243, 1, 0, 0, 0, 3.9333333333333336, 0.8666666666666663],
+              ["point", 0.35, 0.35, 68, 332, 0.010706962044262386, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.03, 41, 1191, 0.14448987339959257, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 735, 9361, 2.086813924034698, 0, 2, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.03, 607, 17227, 3.4307183544379893, 0, 5, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 128, 1117, 0.37051645576175823, 0, 1, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 122, 3292, 0.9201335442757906, 0, 3, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 51, 240, 0.1630917721268827, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 45, 1077, 0.4126322784503816, 0, 2, 1, 0, null, null],
+              ["ocsort", 0.08, 0.08, 424, 6234, 3.8333094936332817, 0, 2, 1, 0, null, null],
+              ["ocsort", 0.08, 0.03, 424, 6234, 3.449281012728557, 0, 2, 1, 0, null, null],
+              ["ocsort", 0.2, 0.2, 57, 642, 0.5880253164936152, 1, 0, 0, 0, 2.2, 0.8666666666666663],
+              ["ocsort", 0.2, 0.03, 57, 642, 0.667384177257743, 1, 0, 0, 0, 2.2, 0.8666666666666663],
+              ["ocsort", 0.35, 0.35, 21, 123, 0.22867911394325946, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.03, 17, 117, 0.3709670886046642, 0, 0, 1, 0, null, null]
+            ]
+          },
+          "red": {
+            "video_sha256": "a84d55ef1336ac163004ab4ba9453e015c4582c4647b79d0f3e4e661af7117b9",
+            "frames": 33,
+            "fps": 10.0,
+            "mean_detector_ms": 16.010157574342113,
+            "runs": [
+              ["point", 0.08, 0.08, 243, 2468, 1.035466666728484, 1, 2, 0, 1, 0.7, 0.4362310530721081],
+              ["point", 0.08, 0.03, 209, 3055, 1.3639878787657698, 1, 2, 0, 1, 0.7, 0.4362310530721081],
+              ["point", 0.2, 0.2, 92, 932, 0.2136030304951198, 1, 2, 0, 1, 0.7, 0.4362310530721081],
+              ["point", 0.2, 0.03, 89, 1344, 0.5167212119417717, 1, 1, 0, 1, 0.7, 0.4362310530721081],
+              ["point", 0.35, 0.35, 33, 477, 0.059900000148142375, 1, 0, 0, 0, 0.7, 0.4362310530721081],
+              ["point", 0.35, 0.03, 40, 711, 0.22162727272547217, 1, 1, 0, 1, 0.7, 0.4362310530721081],
+              ["bytetrack", 0.08, 0.08, 166, 2240, 2.0189393937030355, 1, 1, 0, 1, 0.7, 0.44108559634296873],
+              ["bytetrack", 0.08, 0.03, 168, 3227, 2.683996969470613, 1, 4, 0, 1, 0.7, 0.44108559634296873],
+              ["bytetrack", 0.2, 0.2, 59, 848, 0.8449545452039633, 1, 1, 0, 1, 0.7, 0.4362310530721081],
+              ["bytetrack", 0.2, 0.03, 62, 1418, 1.2684696972207872, 1, 3, 0, 1, 0.7, 0.4362310530721081],
+              ["bytetrack", 0.35, 0.35, 25, 445, 0.46856363637330517, 1, 0, 0, 0, 0.7, 0.4362310530721081],
+              ["bytetrack", 0.35, 0.03, 25, 664, 0.679578787777714, 1, 0, 0, 0, 0.7, 0.4362310530721081],
+              ["ocsort", 0.08, 0.08, 144, 1674, 3.6108696971716583, 1, 1, 0, 0, 0.7, 0.4362310530721081],
+              ["ocsort", 0.08, 0.03, 144, 1674, 3.6577151516791093, 1, 1, 0, 0, 0.7, 0.4362310530721081],
+              ["ocsort", 0.2, 0.2, 50, 651, 1.392542424251918, 1, 0, 0, 0, 0.7, 0.4362310530721081],
+              ["ocsort", 0.2, 0.03, 50, 651, 1.4568606059059896, 1, 0, 0, 0, 0.7, 0.4362310530721081],
+              ["ocsort", 0.35, 0.35, 22, 394, 0.6974909091227208, 1, 0, 0, 0, 0.7, 0.4362310530721081],
+              ["ocsort", 0.35, 0.03, 22, 394, 0.7852818181907589, 1, 0, 0, 0, 0.7, 0.4362310530721081]
+            ]
+          },
+          "night-negative": {
+            "video_sha256": "716d4b28bf887c5182c111256faf811a14b78a49369c70edde66c5b8f6b386d3",
+            "frames": 80,
+            "fps": 10.0,
+            "mean_detector_ms": 16.455953750664776,
+            "runs": [
+              ["point", 0.08, 0.08, 1072, 8056, 1.795164999930421, 0, 0, 0, 0, null, null],
+              ["point", 0.08, 0.03, 1047, 9380, 2.0309587498559267, 0, 0, 0, 0, null, null],
+              ["point", 0.2, 0.2, 287, 1883, 0.14636625001003267, 0, 0, 0, 0, null, null],
+              ["point", 0.2, 0.03, 279, 3109, 0.5415199999333709, 0, 0, 0, 0, null, null],
+              ["point", 0.35, 0.35, 101, 726, 0.038277499879768584, 0, 0, 0, 0, null, null],
+              ["point", 0.35, 0.03, 96, 1227, 0.2286475000801147, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 570, 7212, 2.9392812499281717, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.08, 0.03, 562, 9906, 3.719461249966116, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 133, 1681, 0.7449437500326894, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 120, 3676, 1.4108562500041444, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 49, 656, 0.32558250004512956, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 40, 1308, 0.6206949999977951, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.08, 0.08, 435, 4244, 5.9227187501164735, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.08, 0.03, 435, 4244, 6.229544999951031, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.2, 0.2, 110, 1009, 1.461432500036608, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.2, 0.03, 110, 1009, 1.572951250091137, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.35, 0.35, 47, 455, 0.5912687500313041, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.35, 0.03, 47, 455, 0.7018762500592857, 0, 0, 0, 0, null, null]
+            ]
+          }
+        }
+      },
+      "yolox-m": {
+        "detector": "yolox",
+        "device": "cuda",
+        "split": "development",
+        "cases": {
+          "fog": {
+            "video_sha256": "1f563454a0b974445a3aadc06231a55fd88dd9e4727b3403fdef39773f440a39",
+            "frames": 60,
+            "fps": 7.5,
+            "mean_detector_ms": 12.07827333273599,
+            "runs": [
+              ["point", 0.08, 0.08, 16, 135, 0.010865000028085584, 0, 0, 1, 0, null, null],
+              ["point", 0.08, 0.03, 12, 171, 0.011748333296660954, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.2, 12, 72, 0.006423333494846399, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.03, 7, 133, 0.014876666682539508, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.35, 8, 47, 0.004925000151464094, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.03, 6, 89, 0.007911666762083769, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 11, 111, 16.339611666626297, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.03, 10, 148, 0.1721383331945011, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 9, 56, 0.13054000010015443, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 7, 126, 0.13674999984990185, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 6, 39, 0.07191999999728675, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 6, 83, 0.13734999981049137, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.08, 9, 74, 0.2440066666167695, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.03, 9, 74, 0.24954999995922358, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.2, 6, 39, 0.18574499990791082, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.03, 6, 39, 0.15421000013399558, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.35, 3, 24, 0.11759333331913997, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.03, 3, 24, 0.11868333337285246, 0, 0, 1, 0, null, null]
+            ]
+          },
+          "shadow": {
+            "video_sha256": "8ab378fd0f0d728a5a77fc6c39bae8d2ffcbb7540916a76aba367597b4134d01",
+            "frames": 53,
+            "fps": 7.5,
+            "mean_detector_ms": 12.76681886657519,
+            "runs": [
+              ["point", 0.08, 0.08, 39, 521, 0.04878113230795793, 0, 0, 1, 0, null, null],
+              ["point", 0.08, 0.03, 33, 607, 0.06084716966692007, 0, 1, 1, 0, null, null],
+              ["point", 0.2, 0.2, 29, 370, 0.030607547125568228, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.03, 22, 521, 0.04417169811687309, 0, 1, 1, 0, null, null],
+              ["point", 0.35, 0.35, 24, 270, 0.022811320926642644, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.03, 19, 402, 0.031660377368647255, 0, 1, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 27, 481, 0.37786792436579486, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.03, 31, 568, 0.41965283025143985, 0, 1, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 22, 336, 0.2936622641875215, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 21, 506, 0.38969811334336213, 0, 1, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 16, 238, 0.23083584899311219, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 15, 409, 0.3457679245774722, 0, 1, 1, 0, null, null],
+              ["ocsort", 0.08, 0.08, 21, 404, 0.5540584907581467, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.03, 21, 404, 0.5892150945311306, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.2, 19, 274, 0.4379924527865852, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.03, 19, 274, 0.43491320766921526, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.35, 14, 183, 0.3805471700067052, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.03, 14, 183, 0.37259433966542965, 0, 0, 1, 0, null, null]
+            ]
+          },
+          "highway-stop": {
+            "video_sha256": "1e65102ddc8909f5c0386b167f41d8eb1ab6ad5c3f250a91b7ed55144bf20643",
+            "frames": 158,
+            "fps": 7.5,
+            "mean_detector_ms": 12.184415189984042,
+            "runs": [
+              ["point", 0.08, 0.08, 122, 1122, 0.026565822816890062, 0, 2, 1, 0, null, null],
+              ["point", 0.08, 0.03, 107, 1511, 0.03646012661607252, 0, 3, 1, 0, null, null],
+              ["point", 0.2, 0.2, 74, 535, 0.012750000010621793, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.03, 59, 900, 0.023114556963172377, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.35, 48, 275, 0.007759493718931711, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.03, 42, 462, 0.015623417783888127, 0, 1, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 120, 902, 0.2825259493702221, 0, 1, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.03, 122, 1342, 0.35800569614504546, 0, 2, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 70, 406, 0.1757550633533068, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 69, 839, 0.24921645570982578, 0, 1, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 47, 195, 0.11513607594541192, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 49, 406, 0.1711588607300839, 0, 1, 1, 0, null, null],
+              ["ocsort", 0.08, 0.08, 45, 481, 0.5071113923862223, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.03, 45, 481, 0.5566708860908565, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.2, 22, 139, 0.31695443041964516, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.03, 22, 139, 0.3390373416942002, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.35, 14, 44, 0.28661835446505796, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.03, 11, 41, 0.3056810126946414, 0, 0, 1, 0, null, null]
+            ]
+          },
+          "red": {
+            "video_sha256": "a84d55ef1336ac163004ab4ba9453e015c4582c4647b79d0f3e4e661af7117b9",
+            "frames": 33,
+            "fps": 10.0,
+            "mean_detector_ms": 12.419942424678469,
+            "runs": [
+              ["point", 0.08, 0.08, 35, 481, 0.0594848485585923, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["point", 0.08, 0.03, 35, 504, 0.06230909088062066, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["point", 0.2, 0.2, 29, 416, 0.048124242422283824, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["point", 0.2, 0.03, 29, 442, 0.05446969677877584, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["point", 0.35, 0.35, 26, 364, 0.04166969720796315, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["point", 0.35, 0.03, 26, 413, 0.046930302756443394, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["bytetrack", 0.08, 0.08, 24, 443, 0.4379333333803736, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["bytetrack", 0.08, 0.03, 25, 488, 0.46536363626011845, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["bytetrack", 0.2, 0.2, 23, 390, 0.4019242425618524, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["bytetrack", 0.2, 0.03, 22, 422, 0.40848181798179267, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["bytetrack", 0.35, 0.35, 18, 336, 0.33213333341391815, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["bytetrack", 0.35, 0.03, 19, 408, 0.42039999971166253, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["ocsort", 0.08, 0.08, 21, 405, 0.6711848488493795, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["ocsort", 0.08, 0.03, 21, 405, 0.6723666667698346, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["ocsort", 0.2, 0.2, 19, 347, 0.598057575795489, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["ocsort", 0.2, 0.03, 19, 347, 0.7217090905848609, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["ocsort", 0.35, 0.35, 16, 309, 0.6864636366530745, 1, 0, 0, 0, 0.7, 0.45992387801528056],
+              ["ocsort", 0.35, 0.03, 16, 309, 0.5711212121020777, 1, 0, 0, 0, 0.7, 0.45992387801528056]
+            ]
+          },
+          "night-negative": {
+            "video_sha256": "716d4b28bf887c5182c111256faf811a14b78a49369c70edde66c5b8f6b386d3",
+            "frames": 80,
+            "fps": 10.0,
+            "mean_detector_ms": 12.002077500073938,
+            "runs": [
+              ["point", 0.08, 0.08, 106, 851, 0.05162249999557389, 0, 0, 0, 0, null, null],
+              ["point", 0.08, 0.03, 104, 923, 0.049937499898078386, 0, 0, 0, 0, null, null],
+              ["point", 0.2, 0.2, 76, 655, 0.031149999995250255, 0, 0, 0, 0, null, null],
+              ["point", 0.2, 0.03, 75, 741, 0.03888749997713603, 0, 0, 0, 0, null, null],
+              ["point", 0.35, 0.35, 65, 544, 0.025391249982931186, 0, 0, 0, 0, null, null],
+              ["point", 0.35, 0.03, 65, 671, 0.036677500065707136, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 54, 762, 0.3829924999081413, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.08, 0.03, 52, 948, 0.4301312501411303, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 36, 602, 0.2889350000259583, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 41, 732, 0.3484637500150711, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 33, 493, 0.25804125016293256, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 34, 696, 0.3180199999405886, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.08, 0.08, 46, 624, 0.5996525000227848, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.08, 0.03, 46, 624, 0.5817275001390954, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.2, 0.2, 35, 502, 0.4609562498444575, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.2, 0.03, 35, 502, 0.4791462501088972, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.35, 0.35, 28, 414, 0.39178499991976423, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.35, 0.03, 28, 414, 0.42412625007273164, 0, 0, 0, 0, null, null]
+            ]
+          }
+        }
+      },
+      "yolox-s": {
+        "detector": "yolox",
+        "device": "cuda",
+        "split": "development",
+        "cases": {
+          "fog": {
+            "video_sha256": "1f563454a0b974445a3aadc06231a55fd88dd9e4727b3403fdef39773f440a39",
+            "frames": 60,
+            "fps": 7.5,
+            "mean_detector_ms": 7.2159733341929195,
+            "runs": [
+              ["point", 0.08, 0.08, 12, 49, 0.006223333184607327, 0, 0, 1, 0, null, null],
+              ["point", 0.08, 0.03, 10, 68, 0.006820000029013802, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.2, 4, 22, 0.0034183331687624254, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.03, 3, 37, 0.004958333253550033, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.35, 4, 15, 0.0030333331475655236, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.03, 3, 32, 0.006143333303043619, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 5, 36, 16.485695000058815, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.03, 7, 53, 0.14892166655045003, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 3, 15, 0.05352666679148873, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 3, 34, 0.11866833325863506, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 2, 9, 0.040328333367748805, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 3, 29, 0.07733833335805684, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.08, 2, 23, 0.18430000006143624, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.03, 2, 23, 0.15453500018338673, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.2, 2, 9, 0.08827333343409312, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.03, 2, 9, 0.1042533333626731, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.35, 2, 6, 0.07465666664453845, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.03, 2, 5, 0.09390500005489837, 0, 0, 1, 0, null, null]
+            ]
+          },
+          "shadow": {
+            "video_sha256": "8ab378fd0f0d728a5a77fc6c39bae8d2ffcbb7540916a76aba367597b4134d01",
+            "frames": 53,
+            "fps": 7.5,
+            "mean_detector_ms": 8.698373583786822,
+            "runs": [
+              ["point", 0.08, 0.08, 25, 254, 0.02269622653432823, 0, 0, 1, 0, null, null],
+              ["point", 0.08, 0.03, 24, 314, 0.032201886807462936, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.2, 21, 140, 0.013188679179809284, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.03, 16, 225, 0.02933396213195937, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.35, 14, 80, 0.01075471705265062, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.03, 9, 150, 0.018892452814879845, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 17, 223, 0.25385660382936587, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.03, 19, 294, 0.3288547167409528, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 12, 111, 0.16310000006891437, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 15, 220, 0.23138679246602686, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 6, 62, 0.107016981104916, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 8, 149, 0.1633207548194442, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.08, 15, 159, 0.4305433962968582, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.03, 15, 159, 0.34821698115918925, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.2, 9, 69, 0.30566603774512363, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.03, 9, 69, 0.29667358480850764, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.35, 5, 41, 0.17387924533565793, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.03, 5, 41, 0.18057924528377797, 0, 0, 1, 0, null, null]
+            ]
+          },
+          "highway-stop": {
+            "video_sha256": "1e65102ddc8909f5c0386b167f41d8eb1ab6ad5c3f250a91b7ed55144bf20643",
+            "frames": 158,
+            "fps": 7.5,
+            "mean_detector_ms": 8.2556544305739,
+            "runs": [
+              ["point", 0.08, 0.08, 76, 733, 0.019793670928058556, 1, 1, 0, 0, 2.466666666666667, 0.5999999999999996],
+              ["point", 0.08, 0.03, 65, 1000, 0.026567721565525178, 0, 2, 1, 0, null, null],
+              ["point", 0.2, 0.2, 40, 364, 0.012022151893205187, 0, 0, 1, 0, null, null],
+              ["point", 0.2, 0.03, 31, 649, 0.01900253164997513, 0, 2, 1, 0, null, null],
+              ["point", 0.35, 0.35, 24, 188, 0.006474683571848547, 0, 0, 1, 0, null, null],
+              ["point", 0.35, 0.03, 20, 312, 0.013702531633279698, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 55, 634, 0.2338196202719148, 1, 1, 0, 0, 2.5999999999999996, 0.4666666666666668],
+              ["bytetrack", 0.08, 0.03, 55, 942, 0.3093892405040951, 0, 2, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 37, 303, 0.1416683543872831, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 28, 575, 0.20926518988710108, 0, 1, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 18, 150, 0.10027341773774757, 0, 0, 1, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 19, 306, 0.1490860759307147, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.08, 0.08, 26, 440, 0.3698500000563733, 1, 1, 0, 0, 2.7333333333333334, 0.33333333333333304],
+              ["ocsort", 0.08, 0.03, 26, 440, 0.3448120253698464, 1, 1, 0, 0, 2.7333333333333334, 0.33333333333333304],
+              ["ocsort", 0.2, 0.2, 15, 197, 0.2180620252642533, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.2, 0.03, 15, 197, 0.23478797470776458, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.35, 8, 99, 0.1467797468465022, 0, 0, 1, 0, null, null],
+              ["ocsort", 0.35, 0.03, 8, 99, 0.15272151892842678, 0, 0, 1, 0, null, null]
+            ]
+          },
+          "red": {
+            "video_sha256": "a84d55ef1336ac163004ab4ba9453e015c4582c4647b79d0f3e4e661af7117b9",
+            "frames": 33,
+            "fps": 10.0,
+            "mean_detector_ms": 7.831112119619678,
+            "runs": [
+              ["point", 0.08, 0.08, 29, 414, 0.05280909086154266, 1, 1, 0, 0, 0.7, 0.4422305443912762],
+              ["point", 0.08, 0.03, 29, 458, 0.0630969699352246, 1, 1, 0, 0, 0.7, 0.4422305443912762],
+              ["point", 0.2, 0.2, 23, 337, 0.04156060635013449, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["point", 0.2, 0.03, 23, 395, 0.04530302998539286, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["point", 0.35, 0.35, 21, 294, 0.03124848466761636, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["point", 0.35, 0.03, 22, 358, 0.04047878786822724, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["bytetrack", 0.08, 0.08, 21, 386, 0.3986787879980649, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["bytetrack", 0.08, 0.03, 22, 443, 0.4594969699004044, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["bytetrack", 0.2, 0.2, 19, 313, 0.33754848471179494, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["bytetrack", 0.2, 0.03, 18, 393, 0.41958787848918955, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["bytetrack", 0.35, 0.35, 13, 275, 0.291772726940866, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["bytetrack", 0.35, 0.03, 16, 342, 0.35122727267938014, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["ocsort", 0.08, 0.08, 20, 335, 0.6562000000320206, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["ocsort", 0.08, 0.03, 20, 335, 0.64094242407009, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["ocsort", 0.2, 0.2, 15, 277, 0.5100848484840809, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["ocsort", 0.2, 0.03, 15, 277, 0.5414393941243885, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["ocsort", 0.35, 0.35, 12, 248, 0.47648181851290056, 1, 0, 0, 0, 0.7, 0.4422305443912762],
+              ["ocsort", 0.35, 0.03, 12, 248, 0.475936363341823, 1, 0, 0, 0, 0.7, 0.4422305443912762]
+            ]
+          },
+          "night-negative": {
+            "video_sha256": "716d4b28bf887c5182c111256faf811a14b78a49369c70edde66c5b8f6b386d3",
+            "frames": 80,
+            "fps": 10.0,
+            "mean_detector_ms": 7.571735000965418,
+            "runs": [
+              ["point", 0.08, 0.08, 130, 782, 0.043590000132098794, 0, 0, 0, 0, null, null],
+              ["point", 0.08, 0.03, 121, 893, 0.052040000082342885, 0, 0, 0, 0, null, null],
+              ["point", 0.2, 0.2, 84, 529, 0.026703749972512014, 0, 0, 0, 0, null, null],
+              ["point", 0.2, 0.03, 74, 651, 0.03914874996553408, 0, 0, 0, 0, null, null],
+              ["point", 0.35, 0.35, 62, 419, 0.02221000013378216, 0, 0, 0, 0, null, null],
+              ["point", 0.35, 0.03, 57, 553, 0.031081250017450657, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.08, 0.08, 45, 683, 0.3604812500270782, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.08, 0.03, 54, 909, 0.4392774999359972, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.2, 0.2, 33, 478, 0.26201500004390255, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.2, 0.03, 33, 671, 0.3371512500962126, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.35, 0.35, 29, 381, 0.2738949999184115, 0, 0, 0, 0, null, null],
+              ["bytetrack", 0.35, 0.03, 28, 599, 0.34058250002999557, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.08, 0.08, 40, 532, 0.5954600001132349, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.08, 0.03, 40, 532, 0.6219700000656303, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.2, 0.2, 27, 385, 0.4216499999529333, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.2, 0.03, 27, 385, 0.441288749971136, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.35, 0.35, 23, 318, 0.3559925000445219, 0, 0, 0, 0, null, null],
+              ["ocsort", 0.35, 0.03, 23, 318, 0.35035625005548354, 0, 0, 0, 0, null, null]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "night_transfer": {
+    "camera-1.baseline": {
+      "tolerance_s": 1.0,
+      "spatial_radius_px": 12.0,
+      "time_only_labels": 0,
+      "duration_s": 8.0,
+      "overall": {
+        "true_positives": 0,
+        "false_positives": 0,
+        "false_negatives": 1,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mean_confirmation_delay_s": null,
+        "mean_abs_onset_error_s": null,
+        "duplicate_alerts": 0,
+        "duplicate_alert_rate": null,
+        "false_alarms_per_hour": 0.0
+      },
+      "by_type": {
+        "wrong_way_candidate": {
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 1,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_confirmation_delay_s": null,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": null,
+          "false_alarms_per_hour": 0.0
+        }
+      },
+      "matches": [],
+      "missed_label_indices": [
+        0
+      ],
+      "duplicate_prediction_indices": []
+    },
+    "camera-1.candidate": {
+      "tolerance_s": 1.0,
+      "spatial_radius_px": 12.0,
+      "time_only_labels": 0,
+      "duration_s": 8.0,
+      "overall": {
+        "true_positives": 0,
+        "false_positives": 0,
+        "false_negatives": 1,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mean_confirmation_delay_s": null,
+        "mean_abs_onset_error_s": null,
+        "duplicate_alerts": 0,
+        "duplicate_alert_rate": null,
+        "false_alarms_per_hour": 0.0
+      },
+      "by_type": {
+        "wrong_way_candidate": {
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 1,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_confirmation_delay_s": null,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": null,
+          "false_alarms_per_hour": 0.0
+        }
+      },
+      "matches": [],
+      "missed_label_indices": [
+        0
+      ],
+      "duplicate_prediction_indices": []
+    },
+    "camera-2.baseline": {
+      "tolerance_s": 1.0,
+      "spatial_radius_px": 12.0,
+      "time_only_labels": 0,
+      "duration_s": 8.0,
+      "overall": {
+        "true_positives": 0,
+        "false_positives": 0,
+        "false_negatives": 1,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mean_confirmation_delay_s": null,
+        "mean_abs_onset_error_s": null,
+        "duplicate_alerts": 0,
+        "duplicate_alert_rate": null,
+        "false_alarms_per_hour": 0.0
+      },
+      "by_type": {
+        "wrong_way_candidate": {
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 1,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_confirmation_delay_s": null,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": null,
+          "false_alarms_per_hour": 0.0
+        }
+      },
+      "matches": [],
+      "missed_label_indices": [
+        0
+      ],
+      "duplicate_prediction_indices": []
+    },
+    "camera-2.candidate": {
+      "tolerance_s": 1.0,
+      "spatial_radius_px": 12.0,
+      "time_only_labels": 0,
+      "duration_s": 8.0,
+      "overall": {
+        "true_positives": 0,
+        "false_positives": 0,
+        "false_negatives": 1,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mean_confirmation_delay_s": null,
+        "mean_abs_onset_error_s": null,
+        "duplicate_alerts": 0,
+        "duplicate_alert_rate": null,
+        "false_alarms_per_hour": 0.0
+      },
+      "by_type": {
+        "wrong_way_candidate": {
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 1,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_confirmation_delay_s": null,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": null,
+          "false_alarms_per_hour": 0.0
+        }
+      },
+      "matches": [],
+      "missed_label_indices": [
+        0
+      ],
+      "duplicate_prediction_indices": []
+    }
+  },
+  "backend_parity": {
+    "model_sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+    "video_sha256": "a84d55ef1336ac163004ab4ba9453e015c4582c4647b79d0f3e4e661af7117b9",
+    "resolution": [
+      480,
+      270
+    ],
+    "platform": "Windows-11-10.0.26300-SP0",
+    "opencv": "4.13.0",
+    "onnxruntime": "1.32.0",
+    "raw_max_abs_error": 6.383657455444336e-05,
+    "same_events_within_1ms": true,
+    "backends": {
+      "cpu": {
+        "frames": 33,
+        "mean_detector_ms": 242.4236666658103,
+        "end_to_end_fps": 4.115236241933463,
+        "track_count": 21,
+        "observations": 294,
+        "events": [
+          {
+            "track_id": "vehicle-2",
+            "lane_id": "red",
+            "start_s": 2.242230104745473,
+            "confirmed_s": 2.5,
+            "type": "red_light_crossing_candidate"
+          }
+        ]
+      },
+      "cuda": {
+        "frames": 33,
+        "mean_detector_ms": 8.497760606449887,
+        "end_to_end_fps": 111.43047008797869,
+        "track_count": 21,
+        "observations": 294,
+        "events": [
+          {
+            "track_id": "vehicle-2",
+            "lane_id": "red",
+            "start_s": 2.2422305443912762,
+            "confirmed_s": 2.5,
+            "type": "red_light_crossing_candidate"
+          }
+        ]
+      }
+    }
+  },
+  "decisions": {
+    "yolox_m": "Retained as an option for box accuracy. The better DAWN result did not improve event recall in the replay.",
+    "tiles": "Opt-in. Slower and lower AP on DAWN.",
+    "bytetrack": "Retained as an option for identity consistency.",
+    "ocsort_rtdetr": "Retained as options. Two development matches with no extra alerts, zero of two matches on the frozen night clips.",
+    "cuda": "Retained as a tested application backend. Default CPU baseline remains accessible."
+  }
+}
