@@ -34,6 +34,8 @@ python -m traffic_trajectory scene.json --video clip.mp4 --model object_detectio
 
 The tracker predicts each vehicle's next bottom center from its last two positions. It matches the closest detection within `--track-distance-px` and drops tracks after `max_gap_s` without an observation. Occlusion and overlapping boxes can cause ID switches. Use `--include-tracks` to inspect the positions and IDs behind an alert.
 
+For YOLOX, `--continuation-confidence` lets a lower-score detection extend an existing track within half the normal distance gate. Only detections above `--confidence` can start a track. `--detection-roi LEFT TOP RIGHT BOTTOM` runs the detector on part of the frame. Keep the scene coordinates in full-frame pixels and leave room around vehicles at the crop edges.
+
 ## Docker
 
 Generate the demo clip from Quick start, then run this from the repo root in Bash or WSL.
@@ -68,9 +70,9 @@ The [track fixture](examples/demo.json) emits one wrong-way candidate after 1.0 
 
 Every scene has a `lane` with an `id`, a convex `polygon` in boundary order, and a nonzero `forward` vector pointing in the legal direction. Use image coordinates, with x increasing rightward and y increasing downward. For track input, supply `tracks` with unique IDs and observations in strictly increasing `timestamp_s` order. Use the bottom center of each vehicle box for its `position`.
 
-- **Wrong way.** Count consecutive steps in the lane that meet the distance, heading, and observation-gap thresholds. Emit one event when both the duration and projected reverse displacement pass their thresholds.
+- **Wrong way.** Follow reverse steps in the lane that meet the heading and observation-gap thresholds. Allow brief steps below `min_step_px` for detection jitter. Emit one event when both the duration and net reverse displacement pass their thresholds.
 - **Stopped.** Start a timer when the vehicle enters the lane or moves outside its current stop radius. Emit one event if it stays within the radius for the required duration. A tracking gap or lane exit also resets the timer.
-- **Red light.** Set `stop_line.segment` with two endpoints and `stop_line.red_intervals_s` with ordered, non-overlapping `[start, end)` intervals relative to the first frame. The rule interpolates the time a vehicle crosses the segment in the forward direction. Use synchronized signal data or annotate the red intervals from the clip. [Example scene](examples/video.scene.json)
+- **Red light.** Set `stop_line.segment` with two endpoints and `stop_line.red_intervals_s` with ordered, non-overlapping `[start, end)` intervals relative to the first frame. The vehicle must approach and clear a margin on both sides of the line. The red interval is checked at the interpolated crossing time. Use synchronized signal data or annotate the red intervals from the clip. [Example scene](examples/video.scene.json)
 
 Set overrides in `thresholds`. Pixel-based thresholds depend on camera perspective and frame rate. The stopped rule can flag cars waiting in a queue. Output is sorted by confirmation time and track ID.
 
@@ -81,8 +83,10 @@ Set overrides in `thresholds`. Pixel-based thresholds depend on camera perspecti
 | `max_gap_s` | 0.75 | Maximum interval between consecutive observations |
 | `min_step_px` | 1.0 | Minimum displacement per qualifying step |
 | `min_heading_cosine` | 0.7 | Minimum cosine with the reverse direction |
+| `max_pause_s` | 0.25 | Time a reverse episode can tolerate subthreshold steps |
 | `stopped_duration_s` | 3.0 | Minimum time within the stopped radius |
 | `stopped_radius_px` | 4 | Maximum distance from the stop anchor |
+| `red_line_margin_px` | 2 | Minimum perpendicular distance to arm and confirm a crossing |
 
 ## Evaluation
 
@@ -94,7 +98,7 @@ python -m traffic_trajectory.evaluate predictions.json labels.json --tolerance-s
 
 The evaluator matches events one-to-one by lane, event type, and onset time. It reports precision, recall, F1, and mean confirmation delay. Review simultaneous events of the same type in the same lane by vehicle since generated track IDs can differ from the annotations.
 
-On one nighttime clip, YOLOX-S raised no alerts in a lane with no labeled events. On the NJIT wrong-way clip, it missed both reference events at the default confidence cutoff. Lowering the cutoff recovered one. See the commands, results, and failed tuning attempts in the [experiment log](benchmarks/README.md).
+The real-road checks cover a nighttime lane with no events, highway wrong-way and stopped-vehicle examples, and one red-light crossing. The recorded runs show where low resolution or intermittent detections break a track. See the [experiment log](benchmarks/README.md) for settings, results, and failed trials.
 
 ## Development
 

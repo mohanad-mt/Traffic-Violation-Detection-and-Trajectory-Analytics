@@ -1,0 +1,5 @@
+{
+  "events": [
+    {"type": "red_light_crossing_candidate", "lane_id": "red", "start_s": 1.8}
+  ]
+}

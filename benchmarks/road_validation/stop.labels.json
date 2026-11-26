@@ -1,0 +1,5 @@
+{
+  "events": [
+    {"type": "stopped_vehicle_candidate", "lane_id": "stop", "start_s": 5}
+  ]
+}
