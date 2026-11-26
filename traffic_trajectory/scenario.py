@@ -32,6 +32,14 @@ class Thresholds:
     max_gap_s: float = 0.75
     min_step_px: float = 1.0
     min_heading_cosine: float = 0.7
+    stopped_duration_s: float = 3.0
+    stopped_radius_px: float = 4.0
+
+
+@dataclass(frozen=True)
+class StopLine:
+    segment: tuple[Point, Point]
+    red_intervals_s: tuple[tuple[float, float], ...]
 
 
 @dataclass(frozen=True)
@@ -39,6 +47,7 @@ class Scenario:
     lane: Lane
     thresholds: Thresholds
     tracks: tuple[Track, ...]
+    stop_line: StopLine | None = None
 
 
 def _object(value: object, path: str) -> dict[str, Any]:
@@ -133,6 +142,30 @@ def _parse_track(value: object, path: str) -> Track:
     return Track(track_id, tuple(observations))
 
 
+def _parse_stop_line(value: object, lane: Lane) -> StopLine:
+    config = _object(value, "stop_line")
+    segment = _array(config.get("segment"), "stop_line.segment")
+    if len(segment) != 2:
+        raise ValueError("stop_line.segment must contain two endpoints")
+    start = _point(segment[0], "stop_line.segment[0]")
+    end = _point(segment[1], "stop_line.segment[1]")
+    dx, dy = end[0] - start[0], end[1] - start[1]
+    if dx * lane.forward[1] - dy * lane.forward[0] == 0:
+        raise ValueError("stop_line.segment must cross the lane direction")
+
+    intervals = tuple(
+        _point(interval, f"stop_line.red_intervals_s[{index}]")
+        for index, interval in enumerate(
+            _array(config.get("red_intervals_s"), "stop_line.red_intervals_s")
+        )
+    )
+    if any(not 0 <= begin < finish for begin, finish in intervals):
+        raise ValueError("red intervals must have nonnegative start times and positive duration")
+    if any(previous[1] > current[0] for previous, current in pairwise(intervals)):
+        raise ValueError("red intervals must be ordered and non-overlapping")
+    return StopLine((start, end), intervals)
+
+
 def parse_scenario(value: object) -> Scenario:
     document = _object(value, "scenario")
     lane = _parse_lane(document.get("lane"))
@@ -143,4 +176,5 @@ def parse_scenario(value: object) -> Scenario:
     )
     if len({track.id for track in tracks}) != len(tracks):
         raise ValueError("track IDs must be unique")
-    return Scenario(lane, thresholds, tracks)
+    stop_line = _parse_stop_line(document["stop_line"], lane) if "stop_line" in document else None
+    return Scenario(lane, thresholds, tracks, stop_line)

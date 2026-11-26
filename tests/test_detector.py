@@ -4,7 +4,7 @@ import sys
 import unittest
 from pathlib import Path
 
-from traffic_trajectory.detector import detect_wrong_way
+from traffic_trajectory.detector import detect_events, detect_wrong_way
 from traffic_trajectory.scenario import parse_scenario
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -128,3 +128,55 @@ class CommandLineTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertEqual(result.stdout, "")
         self.assertIn("lane must be an object", result.stderr)
+
+
+class AdditionalEventTests(unittest.TestCase):
+    def test_stop_rearms_after_motion_and_uses_anchor_radius(self):
+        positions = [20, 21, 23, 20, 25, 26, 25, 24]
+        payload = scenario_with_track([(0.5 * index, x, 20) for index, x in enumerate(positions)])
+        payload["thresholds"] = {"stopped_duration_s": 1.0}
+        events = detect_events(parse_scenario(payload))
+
+        self.assertEqual(
+            [(event.start_s, event.confirmed_s) for event in events], [(0, 1), (2, 3)]
+        )
+        self.assertTrue(all(event.type == "stopped_vehicle_candidate" for event in events))
+
+    def test_gap_resets_the_stop_timer(self):
+        payload = scenario_with_track([(0, 20, 20), (0.5, 20, 20), (3, 20, 20), (3.5, 20, 20)])
+        payload["thresholds"] = {"stopped_duration_s": 1.0}
+
+        self.assertEqual(detect_events(parse_scenario(payload)), [])
+
+    def test_crossing_uses_interpolated_time_and_half_open_red_intervals(self):
+        payload = scenario_with_track([(0, 45, 20), (0.5, 55, 20)])
+        payload["stop_line"] = {"segment": [[50, 10], [50, 30]], "red_intervals_s": [[0.25, 1]]}
+        (event,) = detect_events(parse_scenario(payload))
+
+        self.assertEqual(event.type, "red_light_crossing_candidate")
+        self.assertEqual((event.start_s, event.confirmed_s), (0.25, 0.5))
+        payload["stop_line"]["red_intervals_s"] = [[0, 0.25]]
+        self.assertEqual(detect_events(parse_scenario(payload)), [])
+
+    def test_requires_an_approach_to_the_finite_line_without_a_tracking_gap(self):
+        cases = {
+            "starts on the line": [(0, 50, 20), (0.5, 55, 20)],
+            "outside the stop line": [(0, 45, 35), (0.5, 55, 35)],
+            "touches then retreats": [(0, 45, 20), (0.5, 50, 20), (1, 45, 20)],
+            "travels backward": [(0, 55, 20), (0.5, 45, 20)],
+            "tracking gap": [(0, 45, 20), (2, 55, 20)],
+        }
+        for name, samples in cases.items():
+            with self.subTest(name=name):
+                payload = scenario_with_track(samples)
+                payload["stop_line"] = {
+                    "segment": [[50, 30], [50, 10]],
+                    "red_intervals_s": [[0, 3]],
+                }
+                self.assertEqual(detect_events(parse_scenario(payload)), [])
+
+    def test_ignores_lateral_movement_across_an_angled_line(self):
+        payload = scenario_with_track([(0, 47, 25), (0.5, 47, 13)])
+        payload["stop_line"] = {"segment": [[45, 10], [55, 30]], "red_intervals_s": [[0, 1]]}
+
+        self.assertEqual(detect_events(parse_scenario(payload)), [])
