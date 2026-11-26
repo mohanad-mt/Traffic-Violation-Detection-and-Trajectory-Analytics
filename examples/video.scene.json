@@ -1,0 +1,11 @@
+{
+  "lane": {
+    "id": "eastbound",
+    "polygon": [[0, 10], [310, 10], [310, 150], [0, 150]],
+    "forward": [1, 0]
+  },
+  "stop_line": {
+    "segment": [[170, 15], [170, 145]],
+    "red_intervals_s": [[2.0, 4.0]]
+  }
+}

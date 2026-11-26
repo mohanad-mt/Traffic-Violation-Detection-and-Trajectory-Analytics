@@ -21,7 +21,7 @@ jobs:
           python-version: "3.13"
       - name: Lint and check formatting
         run: |
-          python -m pip install -r requirements-dev.txt
+          python -m pip install -r requirements-dev.txt -r requirements-video.txt
           python -m ruff check .
           python -m ruff format --check .
       - name: Test
@@ -32,3 +32,11 @@ jobs:
           docker run --rm -i --network=none --read-only traffic-trajectory - \
             < examples/demo.json > "$RUNNER_TEMP/traffic-events.json"
           diff -u examples/demo.expected.json "$RUNNER_TEMP/traffic-events.json"
+          python examples/generate_video.py "$RUNNER_TEMP/traffic-demo"
+          docker run --rm -i --network=none --read-only \
+            --mount "type=bind,src=$RUNNER_TEMP/traffic-demo,dst=/demo,readonly" \
+            traffic-trajectory - --video /demo/demo.avi --background /demo/background.png \
+            < examples/video.scene.json > "$RUNNER_TEMP/video-events.json"
+          python -m traffic_trajectory.evaluate "$RUNNER_TEMP/video-events.json" \
+            examples/video.labels.json > "$RUNNER_TEMP/video-metrics.json"
+          python -c 'import json, sys; metrics = json.load(open(sys.argv[1]))["overall"]; assert metrics["true_positives"] == 3 and metrics["f1"] == 1, metrics' "$RUNNER_TEMP/video-metrics.json"
