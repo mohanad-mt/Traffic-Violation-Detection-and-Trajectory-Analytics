@@ -11,6 +11,15 @@ ROOT = Path(__file__).resolve().parents[1]
 DEMO = ROOT / "examples" / "demo.json"
 
 
+def make_track(track_id, samples):
+    return {
+        "id": track_id,
+        "observations": [
+            {"timestamp_s": timestamp, "position": [x, y]} for timestamp, x, y in samples
+        ],
+    }
+
+
 def scenario_with_track(samples):
     return {
         "lane": {
@@ -18,14 +27,7 @@ def scenario_with_track(samples):
             "polygon": [[0, 0], [200, 0], [200, 40], [0, 40]],
             "forward": [1, 0],
         },
-        "tracks": [
-            {
-                "id": "vehicle",
-                "observations": [
-                    {"timestamp_s": timestamp, "position": [x, y]} for timestamp, x, y in samples
-                ],
-            }
-        ],
+        "tracks": [make_track("vehicle", samples)],
     }
 
 
@@ -159,6 +161,46 @@ class AdditionalEventTests(unittest.TestCase):
         payload["thresholds"] = {"stopped_duration_s": 1.0}
 
         self.assertEqual(detect_events(parse_scenario(payload)), [])
+
+    def test_stop_alert_survives_a_track_split_and_short_stationary_fragment(self):
+        payload = scenario_with_track([(0, 20, 20), (0.5, 20, 20), (1, 20, 20)])
+        payload["thresholds"] = {"stopped_duration_s": 1.0}
+        payload["tracks"].extend(
+            [
+                make_track("short-fragment", [(2.5, 21, 20), (3, 22, 20)]),
+                make_track("reacquired", [(4.5, 23, 20), (5, 21, 20), (5.5, 21, 20)]),
+            ]
+        )
+
+        (event,) = detect_events(parse_scenario(payload))
+        self.assertEqual((event.track_id, event.start_s, event.confirmed_s), ("vehicle", 0, 1))
+        payload["thresholds"]["stopped_realert_gap_s"] = 0
+        self.assertEqual(len(detect_events(parse_scenario(payload))), 2)
+
+    def test_stop_does_not_realert_after_gap_inside_the_same_track(self):
+        samples = [(t, 20, 20) for t in (0, 0.5, 1, 2.5, 3, 3.5)]
+        payload = scenario_with_track(samples)
+        payload["thresholds"] = {"stopped_duration_s": 1.0}
+
+        (event,) = detect_events(parse_scenario(payload))
+        self.assertEqual(event.confirmed_s, 1)
+
+    def test_distinguishes_stops_after_departure_or_long_gap_and_overlapping_stops(self):
+        cases = (
+            ("observed departure", [(1.5, 30, 20)], 2, 20),
+            ("expired stop", [], 4, 20),
+            ("overlap", [(1.5, 20, 20)], 1.25, 21),
+            ("different position", [], 2, 27),
+        )
+        for name, tail, start, x in cases:
+            with self.subTest(name=name):
+                payload = scenario_with_track([(0, 20, 20), (0.5, 20, 20), (1, 20, 20), *tail])
+                payload["thresholds"] = {"stopped_duration_s": 1.0}
+                payload["tracks"].append(
+                    make_track("other", [(start + offset, x, 20) for offset in (0, 0.5, 1)])
+                )
+                events = detect_events(parse_scenario(payload))
+                self.assertEqual([event.track_id for event in events], ["vehicle", "other"])
 
     def test_crossing_uses_interpolated_time_and_half_open_red_intervals(self):
         payload = scenario_with_track([(0, 45, 20), (0.5, 55, 20)])

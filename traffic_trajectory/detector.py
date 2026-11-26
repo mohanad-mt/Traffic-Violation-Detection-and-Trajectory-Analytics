@@ -4,7 +4,7 @@ from itertools import pairwise
 from math import dist, hypot
 from typing import Literal
 
-from .scenario import Lane, Scenario, StopLine, Thresholds, Track
+from .scenario import Lane, Observation, Scenario, StopLine, Thresholds, Track
 
 
 @dataclass(frozen=True)
@@ -99,27 +99,81 @@ def detect_wrong_way(scenario: Scenario) -> list[WrongWayEvent]:
     return sorted(events, key=lambda event: (event.confirmed_s, event.track_id))
 
 
-def _detect_stopped(
-    track: Track, lane: Lane, thresholds: Thresholds
-) -> Iterator[StoppedVehicleEvent]:
+@dataclass(frozen=True)
+class _StopRun:
+    track_id: str
+    anchor: Observation
+    last: Observation
+    confirmed_s: float | None
+    interrupted: bool
+
+
+def _stationary_runs(track: Track, lane: Lane, thresholds: Thresholds) -> Iterator[_StopRun]:
     anchor = None
-    last_s = 0.0
-    emitted = False
+    last = None
+    confirmed_s = None
     for sample in track.observations:
-        if not lane.polygon.contains(sample.position):
-            anchor = None
-            continue
-        if (
-            anchor is None
-            or sample.timestamp_s - last_s > thresholds.max_gap_s
+        in_lane = lane.polygon.contains(sample.position)
+        gap = last is not None and sample.timestamp_s - last.timestamp_s > thresholds.max_gap_s
+        if anchor is not None and (
+            gap
+            or not in_lane
             or dist(anchor.position, sample.position) > thresholds.stopped_radius_px
         ):
+            yield _StopRun(track.id, anchor, last, confirmed_s, gap)
+            anchor = None
+            confirmed_s = None
+        if not in_lane:
+            continue
+        if anchor is None:
             anchor = sample
-            emitted = False
-        last_s = sample.timestamp_s
-        if not emitted and last_s - anchor.timestamp_s >= thresholds.stopped_duration_s:
-            yield StoppedVehicleEvent(track.id, lane.id, anchor.timestamp_s, last_s)
-            emitted = True
+        last = sample
+        if (
+            confirmed_s is None
+            and last.timestamp_s - anchor.timestamp_s >= thresholds.stopped_duration_s
+        ):
+            confirmed_s = last.timestamp_s
+
+    if anchor is not None:
+        yield _StopRun(track.id, anchor, last, confirmed_s, True)
+
+
+def _detect_stopped(scenario: Scenario) -> Iterator[StoppedVehicleEvent]:
+    lane, thresholds = scenario.lane, scenario.thresholds
+    runs = sorted(
+        (run for track in scenario.tracks for run in _stationary_runs(track, lane, thresholds)),
+        key=lambda run: (run.anchor.timestamp_s, run.track_id),
+    )
+    reported = []
+    bridge_duration = min(0.5, thresholds.stopped_duration_s / 2)
+    for run in runs:
+        start_s = run.anchor.timestamp_s
+        reported = [
+            (anchor, prior)
+            for anchor, prior in reported
+            if start_s - prior.last.timestamp_s <= thresholds.stopped_realert_gap_s
+        ]
+        if run.last.timestamp_s - start_s < bridge_duration:
+            continue
+
+        # Bridge a lost track only when there is one plausible stationary predecessor.
+        matches = [
+            (anchor, prior)
+            for anchor, prior in reported
+            if prior.last.timestamp_s < start_s
+            and dist(prior.last.position, run.anchor.position) <= thresholds.stopped_radius_px
+            and dist(anchor.position, run.last.position) <= thresholds.stopped_radius_px
+        ]
+        if len(matches) == 1:
+            anchor, prior = matches[0]
+            reported.remove((anchor, prior))
+        elif run.confirmed_s is not None:
+            yield StoppedVehicleEvent(run.track_id, lane.id, start_s, run.confirmed_s)
+            anchor = run.anchor
+        else:
+            continue
+        if run.interrupted:
+            reported.append((anchor, run))
 
 
 def _detect_red_light(
@@ -179,8 +233,8 @@ def _detect_red_light(
 
 def detect_events(scenario: Scenario) -> list[Event]:
     events: list[Event] = list(detect_wrong_way(scenario))
+    events.extend(_detect_stopped(scenario))
     for track in scenario.tracks:
-        events.extend(_detect_stopped(track, scenario.lane, scenario.thresholds))
         if scenario.stop_line is not None:
             events.extend(
                 _detect_red_light(track, scenario.lane, scenario.thresholds, scenario.stop_line)

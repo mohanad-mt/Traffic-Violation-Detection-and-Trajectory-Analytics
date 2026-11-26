@@ -35,6 +35,7 @@ class Thresholds:
     max_pause_s: float = 0.25
     stopped_duration_s: float = 3.0
     stopped_radius_px: float = 4.0
+    stopped_realert_gap_s: float = 2.0
     red_line_margin_px: float = 2.0
 
 
@@ -119,7 +120,7 @@ def _parse_thresholds(value: object) -> Thresholds:
         for name in sorted(names)
     }
     for name, number in values.items():
-        if name in {"max_pause_s", "red_line_margin_px"}:
+        if name in {"max_pause_s", "red_line_margin_px", "stopped_realert_gap_s"}:
             if number < 0:
                 raise ValueError(f"thresholds.{name} must be nonnegative")
         elif number <= 0:
