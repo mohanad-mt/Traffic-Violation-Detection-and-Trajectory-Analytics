@@ -31,6 +31,11 @@ def main() -> None:
         metavar=("LEFT", "TOP", "RIGHT", "BOTTOM"),
         help="Run YOLOX on a rectangle in video pixels",
     )
+    parser.add_argument(
+        "--detection-tile-size",
+        type=int,
+        help="Also run YOLOX on overlapping square crops of this size in pixels",
+    )
     parser.add_argument("--min-blob-area-px", type=int, default=100, help="Foreground area cutoff")
     parser.add_argument(
         "--track-distance-px", type=float, default=24, help="Tracker distance gate"
@@ -46,6 +51,11 @@ def main() -> None:
             parser.error("--continuation-confidence must be positive and at most --confidence")
     if args.detection_roi is not None and args.model is None:
         parser.error("--detection-roi requires --model")
+    if args.detection_tile_size is not None:
+        if args.model is None:
+            parser.error("--detection-tile-size requires --model")
+        if args.detection_tile_size <= 0:
+            parser.error("--detection-tile-size must be positive")
 
     try:
         if args.scenario == "-":
@@ -79,7 +89,11 @@ def main() -> None:
                 if args.model is not None:
                     roi = tuple(args.detection_roi) if args.detection_roi is not None else None
                     detect = YoloXDetector(
-                        args.model, args.confidence, args.continuation_confidence, roi
+                        args.model,
+                        args.confidence,
+                        args.continuation_confidence,
+                        roi,
+                        tile_size=args.detection_tile_size,
                     )
                 else:
                     detect = foreground_detector(args.background, args.min_blob_area_px)

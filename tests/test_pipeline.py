@@ -123,12 +123,19 @@ class VideoTests(unittest.TestCase):
     def test_yolox_separates_weak_vehicle_candidates(self):
         import numpy as np
 
-        from traffic_trajectory.yolox import _vehicle_detections
+        from traffic_trajectory.yolox import YoloXDetector
 
         prediction = np.zeros((1, 8400, 85), dtype=np.float32)
         prediction[0, 20 * 80 + 40, 4:8] = [0.9, 0, 0, 0.9]
         prediction[0, 20 * 80 + 30, 4:8] = [0.2, 0, 0, 0.9]
-        detections = _vehicle_detections(prediction, 2, 320, 160, 0.35, 0.08)
+        net = Mock()
+        net.forward.return_value = prediction
+        with (
+            patch("traffic_trajectory.yolox.Path.is_file", return_value=True),
+            patch("traffic_trajectory.yolox.cv2.dnn.readNetFromONNX", return_value=net),
+        ):
+            detector = YoloXDetector(Path("model.onnx"), 0.35, 0.08)
+            detections = detector(np.zeros((160, 320, 3), dtype=np.uint8))
 
         self.assertEqual(detections.strong, [(160, 82)])
         self.assertEqual(detections.weak, [(120, 82)])
@@ -151,3 +158,45 @@ class VideoTests(unittest.TestCase):
             self.assertEqual(detector(frame).strong, [(230, 122)])
             with self.assertRaisesRegex(ValueError, "detection ROI"):
                 detector(frame[:, :300])
+
+    def test_yolox_tiles_merge_duplicate_boxes_and_drop_internal_edge_boxes(self):
+        import numpy as np
+
+        from traffic_trajectory.yolox import VehicleBox, YoloXDetector
+
+        duplicate = VehicleBox(360, 100, 40, 30, 0.8)
+        partial = VehicleBox(455, 100, 24, 30, 0.9)
+        extra = VehicleBox(520, 150, 20, 20, 0.7)
+        with (
+            patch("traffic_trajectory.yolox.Path.is_file", return_value=True),
+            patch("traffic_trajectory.yolox.cv2.dnn.readNetFromONNX"),
+            patch.object(
+                YoloXDetector,
+                "_window_boxes",
+                side_effect=[[duplicate], [partial], [extra, duplicate]],
+            ) as predict_window,
+        ):
+            detector = YoloXDetector(Path("model.onnx"), 0.35, tile_size=480)
+            boxes = detector.predict_boxes(np.zeros((480, 800, 3), dtype=np.uint8))
+
+        self.assertEqual(
+            [call.args[1] for call in predict_window.call_args_list],
+            [
+                (0, 0, 800, 480),
+                (0, 0, 480, 480),
+                (320, 0, 800, 480),
+            ],
+        )
+        self.assertEqual(boxes, [duplicate, extra])
+
+    def test_box_evaluator_matches_each_annotation_once(self):
+        from benchmarks.foggy_driving.evaluate_boxes import _labels, _matched_labels
+        from traffic_trajectory.yolox import VehicleBox
+
+        (label,) = _labels("0 11 21 40 40\n1 1 1 30 20\n")
+        correct = VehicleBox(10, 20, 30, 20, 0.9)
+        duplicate = VehicleBox(10, 20, 30, 20, 0.8)
+        distant = VehicleBox(70, 60, 20, 20, 0.95)
+
+        self.assertEqual(label, VehicleBox(10, 20, 30, 20, 1.0))
+        self.assertEqual(_matched_labels([correct, duplicate, distant], [label]), [label])
