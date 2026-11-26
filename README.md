@@ -98,7 +98,9 @@ python -m traffic_trajectory.evaluate predictions.json labels.json --tolerance-s
 
 The evaluator pairs each prediction with at most one label by lane, event type, and onset tolerance. It reports precision, recall, F1, and mean confirmation delay relative to the annotated onset. Matching uses time and lane because video-generated track IDs can differ from the annotated IDs. Simultaneous events of the same type in the same lane need identity-aware review.
 
-The [AI City Challenge 2021 Traffic Anomaly Detection track](https://www.aicitychallenge.org/2021-data-and-evaluation/#:~:text=Track%204%3A%20Traffic%20Anomaly%20Detection) provides real traffic footage with timestamps for anomalies such as stalls and crashes. For this project's three event classes, review scene-specific labels and record red phases where visible or available. Results in this README are from the generated clip.
+The [nighttime road clip check](benchmarks/nighttime/README.md) uses pretrained YOLOX-S on an eight-second sample of real traffic with a manually annotated lane. It covers one clip with no labeled events.
+
+The [AI City Challenge 2021 Traffic Anomaly Detection track](https://www.aicitychallenge.org/2021-data-and-evaluation/#:~:text=Track%204%3A%20Traffic%20Anomaly%20Detection) provides real traffic footage with timestamps for anomalies such as stalls and crashes. For this project's three event classes, review scene-specific labels and record red phases where visible or available.
 
 ## Development
 
