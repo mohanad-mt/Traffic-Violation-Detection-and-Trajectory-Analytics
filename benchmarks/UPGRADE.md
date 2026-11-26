@@ -71,4 +71,4 @@ Use `--dataset foggy-driving` with the Foggy Driving archive to repeat the devel
 python -m benchmarks.road_validation.compare object_detection_yolox_2022nov.onnx build/road build/nighttime/sample.avi --device cuda --tracker point bytetrack ocsort --cache-dir build/road/boxes-s
 ```
 
-The [run records](runs/upgrade.json) retain exact scores, counts and inputs. The [research notes](RESEARCH.md) record the alternatives and data access issues.
+The [run records](runs/upgrade.json) retain exact scores, counts and inputs. The [research notes](RESEARCH.md) record the alternatives and data access issues. A follow-up compared [same-frame and prior-frame crop guidance](road_validation/TRACK_GUIDANCE.md) on the fog clip.

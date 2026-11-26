@@ -1,0 +1,301 @@
+{
+  "code_base_commit": "4c5bf071fd068f3fc086d9664de1d01ef32562a0",
+  "model_sha256": "fe87a5a30f5daf298d10794c7682a63b6107986f97d6a770ba948d89e4340093",
+  "device": "cuda",
+  "hardware": "NVIDIA GeForce RTX 5090",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "settings": {
+    "full_floor": 0.03,
+    "seed_floor": 0.06,
+    "strong": 0.2,
+    "crop_sides": [
+      64,
+      96
+    ],
+    "crop_budget": 4,
+    "gate_px": 16
+  },
+  "cases": {
+    "fog": {
+      "fps": 7.5,
+      "frames": 60,
+      "video_sha256": "1f563454a0b974445a3aadc06231a55fd88dd9e4727b3403fdef39773f440a39",
+      "mean_full_ms": 14.265691666029548,
+      "runs": {
+        "full_0.20": {
+          "reference_hits": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "crop_calls": 0,
+          "extra_ms_per_frame": 0,
+          "added_boxes": 0,
+          "alerts": {
+            "point": [0, 0, 1, 671, 28, null, null],
+            "ocsort": [0, 0, 1, 123, 16, null, null]
+          }
+        },
+        "full_0.03": {
+          "reference_hits": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false
+          ],
+          "crop_calls": 0,
+          "extra_ms_per_frame": 0,
+          "added_boxes": 0,
+          "alerts": {
+            "point": [0, 8, 1, 7348, 669, null, null],
+            "ocsort": [0, 5, 1, 4545, 407, null, null]
+          }
+        },
+        "current_frame_crop_64": {
+          "reference_hits": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "crop_calls": 144,
+          "extra_ms_per_frame": 32.45916500066718,
+          "added_boxes": 4,
+          "alerts": {
+            "point": [0, 0, 1, 671, 28, null, null],
+            "ocsort": [0, 0, 1, 128, 16, null, null]
+          }
+        },
+        "current_frame_crop_96": {
+          "reference_hits": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "crop_calls": 126,
+          "extra_ms_per_frame": 28.525445000074495,
+          "added_boxes": 9,
+          "alerts": {
+            "point": [0, 0, 1, 671, 28, null, null],
+            "ocsort": [0, 0, 1, 135, 16, null, null]
+          }
+        },
+        "prior_frame_crop_64": {
+          "reference_hits": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "crop_calls": 143,
+          "extra_ms_per_frame": 32.62777166625407,
+          "added_boxes": 5,
+          "alerts": {
+            "point": [0, 0, 1, 671, 28, null, null],
+            "ocsort": [0, 0, 1, 131, 16, null, null]
+          }
+        },
+        "prior_frame_crop_96": {
+          "reference_hits": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "crop_calls": 125,
+          "extra_ms_per_frame": 27.850295000340946,
+          "added_boxes": 9,
+          "alerts": {
+            "point": [0, 0, 1, 671, 28, null, null],
+            "ocsort": [0, 0, 1, 136, 16, null, null]
+          }
+        }
+      },
+      "reference_centered_crop_scores": {
+        "64": [
+          0.0731591135263443,
+          null,
+          0.12219467759132385,
+          0.09218323230743408,
+          null,
+          null,
+          null
+        ],
+        "96": [
+          0.1315964311361313,
+          0.08518145978450775,
+          0.08859433233737946,
+          0.08456631004810333,
+          0.08741976320743561,
+          0.08270828425884247,
+          null
+        ]
+      }
+    },
+    "red": {
+      "fps": 10.0,
+      "frames": 33,
+      "video_sha256": "a84d55ef1336ac163004ab4ba9453e015c4582c4647b79d0f3e4e661af7117b9",
+      "mean_full_ms": 14.56095757506167,
+      "runs": {
+        "full_0.20": {
+          "reference_hits": null,
+          "crop_calls": 0,
+          "extra_ms_per_frame": 0,
+          "added_boxes": 0,
+          "alerts": {
+            "point": [1, 1, 0, 1344, 89, 0.4362310530721081, 0.7],
+            "ocsort": [1, 0, 0, 651, 50, 0.4362310530721081, 0.7]
+          }
+        },
+        "full_0.03": {
+          "reference_hits": null,
+          "crop_calls": 0,
+          "extra_ms_per_frame": 0,
+          "added_boxes": 0,
+          "alerts": {
+            "point": [1, 5, 0, 5274, 483, 0.4326832403216112, 0.7],
+            "ocsort": [1, 1, 0, 3580, 331, 0.4856239829690703, 0.7]
+          }
+        },
+        "current_frame_crop_64": {
+          "reference_hits": null,
+          "crop_calls": 5,
+          "extra_ms_per_frame": 2.102160607164754,
+          "added_boxes": 3,
+          "alerts": {
+            "point": [1, 1, 0, 1344, 89, 0.4362310530721081, 0.7],
+            "ocsort": [1, 0, 0, 652, 50, 0.4362310530721081, 0.7]
+          }
+        },
+        "current_frame_crop_96": {
+          "reference_hits": null,
+          "crop_calls": 11,
+          "extra_ms_per_frame": 4.6600757583898185,
+          "added_boxes": 4,
+          "alerts": {
+            "point": [1, 1, 0, 1347, 88, 0.4362310530721081, 0.7],
+            "ocsort": [1, 0, 0, 652, 50, 0.4362310530721081, 0.7]
+          }
+        },
+        "prior_frame_crop_64": {
+          "reference_hits": null,
+          "crop_calls": 5,
+          "extra_ms_per_frame": 2.067251515461866,
+          "added_boxes": 3,
+          "alerts": {
+            "point": [1, 1, 0, 1348, 86, 0.4362310530721081, 0.7],
+            "ocsort": [1, 0, 0, 652, 50, 0.4362310530721081, 0.7]
+          }
+        },
+        "prior_frame_crop_96": {
+          "reference_hits": null,
+          "crop_calls": 11,
+          "extra_ms_per_frame": 4.747521212927743,
+          "added_boxes": 2,
+          "alerts": {
+            "point": [1, 1, 0, 1346, 87, 0.4362310530721081, 0.7],
+            "ocsort": [1, 0, 0, 656, 51, 0.4362310530721081, 0.7]
+          }
+        }
+      }
+    },
+    "night-negative": {
+      "fps": 10.0,
+      "frames": 80,
+      "video_sha256": "716d4b28bf887c5182c111256faf811a14b78a49369c70edde66c5b8f6b386d3",
+      "mean_full_ms": 14.904333749836951,
+      "runs": {
+        "full_0.20": {
+          "reference_hits": null,
+          "crop_calls": 0,
+          "extra_ms_per_frame": 0,
+          "added_boxes": 0,
+          "alerts": {
+            "point": [0, 0, 0, 3109, 279, null, null],
+            "ocsort": [0, 0, 0, 1009, 110, null, null]
+          }
+        },
+        "full_0.03": {
+          "reference_hits": null,
+          "crop_calls": 0,
+          "extra_ms_per_frame": 0,
+          "added_boxes": 0,
+          "alerts": {
+            "point": [0, 0, 0, 12974, 1578, null, null],
+            "ocsort": [0, 0, 0, 6985, 702, null, null]
+          }
+        },
+        "current_frame_crop_64": {
+          "reference_hits": null,
+          "crop_calls": 14,
+          "extra_ms_per_frame": 2.446839999356598,
+          "added_boxes": 7,
+          "alerts": {
+            "point": [0, 0, 0, 3103, 281, null, null],
+            "ocsort": [0, 0, 0, 1010, 111, null, null]
+          }
+        },
+        "current_frame_crop_96": {
+          "reference_hits": null,
+          "crop_calls": 38,
+          "extra_ms_per_frame": 6.685482499960926,
+          "added_boxes": 11,
+          "alerts": {
+            "point": [0, 0, 0, 3108, 280, null, null],
+            "ocsort": [0, 0, 0, 1009, 110, null, null]
+          }
+        },
+        "prior_frame_crop_64": {
+          "reference_hits": null,
+          "crop_calls": 13,
+          "extra_ms_per_frame": 2.257425001153024,
+          "added_boxes": 6,
+          "alerts": {
+            "point": [0, 0, 0, 3107, 281, null, null],
+            "ocsort": [0, 0, 0, 1009, 110, null, null]
+          }
+        },
+        "prior_frame_crop_96": {
+          "reference_hits": null,
+          "crop_calls": 36,
+          "extra_ms_per_frame": 6.746394999936456,
+          "added_boxes": 7,
+          "alerts": {
+            "point": [0, 0, 0, 3105, 281, null, null],
+            "ocsort": [0, 0, 0, 1013, 111, null, null]
+          }
+        }
+      }
+    }
+  },
+  "alert_columns": [
+    "true_positives",
+    "false_positives",
+    "false_negatives",
+    "observations",
+    "track_ids",
+    "mean_abs_onset_error_s",
+    "mean_confirmation_delay_s"
+  ]
+}
