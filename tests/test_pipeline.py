@@ -189,6 +189,26 @@ class VideoTests(unittest.TestCase):
         )
         self.assertEqual(boxes, [duplicate, extra])
 
+    def test_yolox_tile_cutoff_filters_before_merging_with_full_view(self):
+        import numpy as np
+
+        from traffic_trajectory.yolox import VehicleBox, YoloXDetector
+
+        full = VehicleBox(80, 80, 30, 30, 0.5)
+        duplicate = VehicleBox(80, 80, 30, 30, 0.7)
+        extra = VehicleBox(520, 150, 20, 20, 0.8)
+        with (
+            patch("traffic_trajectory.yolox.Path.is_file", return_value=True),
+            patch("traffic_trajectory.yolox.cv2.dnn.readNetFromONNX"),
+            patch.object(
+                YoloXDetector, "_window_boxes", side_effect=[[full], [duplicate], [extra]]
+            ),
+        ):
+            detector = YoloXDetector(Path("model.onnx"), 0.35, tile_size=480, tile_confidence=0.75)
+            boxes = detector.predict_boxes(np.zeros((480, 800, 3), dtype=np.uint8))
+
+        self.assertEqual(boxes, [extra, full])
+
     def test_box_evaluator_matches_each_annotation_once(self):
         from benchmarks.foggy_driving.evaluate_boxes import _labels, _matched_labels
         from traffic_trajectory.yolox import VehicleBox

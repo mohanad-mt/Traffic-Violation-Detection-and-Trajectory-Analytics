@@ -1,11 +1,14 @@
 import argparse
 import json
+from collections.abc import Iterator
+from dataclasses import dataclass
 from pathlib import Path
 from time import perf_counter
 from zipfile import ZipFile
 
 import cv2
 import numpy as np
+from cv2.typing import MatLike
 
 from traffic_trajectory.yolox import VehicleBox, YoloXDetector
 
@@ -53,17 +56,16 @@ def _rate(numerator: int, denominator: int) -> float | None:
     return numerator / denominator if denominator else None
 
 
-def evaluate(archive: Path, detector: YoloXDetector) -> dict:
-    images = expected = predicted = matched = small = small_matched = 0
-    seconds = 0.0
+def examples(archive: Path, split: str) -> Iterator[tuple[MatLike, list[VehicleBox]]]:
+    expected_images = {"test": 33, "test_extra": 68}[split]
     with ZipFile(archive) as dataset:
         files = sorted(
             name
             for name in dataset.namelist()
-            if "/leftImg8bit/test/" in name and name.endswith("_leftImg8bit.png")
+            if f"/leftImg8bit/{split}/" in name and name.endswith("_leftImg8bit.png")
         )
-        if len(files) != 33:
-            raise ValueError("expected 33 images in the Foggy Driving fine test split")
+        if len(files) != expected_images:
+            raise ValueError(f"expected {expected_images} images in Foggy Driving's {split} split")
         for name in files:
             labels = _labels(
                 dataset.read(
@@ -76,31 +78,56 @@ def evaluate(archive: Path, detector: YoloXDetector) -> dict:
             )
             if frame is None:
                 raise ValueError(f"cannot decode {name}")
-            start = perf_counter()
-            boxes = detector.predict_boxes(frame)
-            seconds += perf_counter() - start
-            hits = _matched_labels(boxes, labels)
-            images += 1
-            expected += len(labels)
-            predicted += len(boxes)
-            matched += len(hits)
-            small += sum(_area(label) < SMALL_AREA for label in labels)
-            small_matched += sum(_area(label) < SMALL_AREA for label in hits)
+            yield frame, labels
 
-    return {
-        "images": images,
-        "iou": MATCH_IOU,
-        "labels": expected,
-        "true_positives": matched,
-        "false_positives": predicted - matched,
-        "false_negatives": expected - matched,
-        "precision": _rate(matched, predicted),
-        "recall": _rate(matched, expected),
-        "small_labels": small,
-        "small_matches": small_matched,
-        "small_recall": _rate(small_matched, small),
-        "mean_inference_ms": 1000 * seconds / images,
-    }
+
+@dataclass
+class BoxCounts:
+    images: int = 0
+    labels: int = 0
+    predictions: int = 0
+    matches: int = 0
+    small_labels: int = 0
+    small_matches: int = 0
+
+    def add(self, boxes: list[VehicleBox], labels: list[VehicleBox]) -> None:
+        hits = _matched_labels(boxes, labels)
+        self.images += 1
+        self.labels += len(labels)
+        self.predictions += len(boxes)
+        self.matches += len(hits)
+        self.small_labels += sum(_area(label) < SMALL_AREA for label in labels)
+        self.small_matches += sum(_area(label) < SMALL_AREA for label in hits)
+
+    @property
+    def precision(self) -> float | None:
+        return _rate(self.matches, self.predictions)
+
+    def report(self) -> dict:
+        return {
+            "images": self.images,
+            "iou": MATCH_IOU,
+            "labels": self.labels,
+            "true_positives": self.matches,
+            "false_positives": self.predictions - self.matches,
+            "false_negatives": self.labels - self.matches,
+            "precision": self.precision,
+            "recall": _rate(self.matches, self.labels),
+            "small_labels": self.small_labels,
+            "small_matches": self.small_matches,
+            "small_recall": _rate(self.small_matches, self.small_labels),
+        }
+
+
+def evaluate(archive: Path, detector: YoloXDetector) -> dict:
+    counts = BoxCounts()
+    seconds = 0.0
+    for frame, labels in examples(archive, "test"):
+        start = perf_counter()
+        boxes = detector.predict_boxes(frame)
+        seconds += perf_counter() - start
+        counts.add(boxes, labels)
+    return {**counts.report(), "mean_inference_ms": 1000 * seconds / counts.images}
 
 
 def main() -> None:
@@ -111,18 +138,26 @@ def main() -> None:
     parser.add_argument("model", type=Path)
     parser.add_argument("--confidence", type=float, default=0.35)
     parser.add_argument("--tile-size", type=int)
+    parser.add_argument("--tile-confidence", type=float)
     args = parser.parse_args()
     if not 0 < args.confidence < 1:
         parser.error("--confidence must be between 0 and 1")
-    if args.tile_size is not None and args.tile_size <= 0:
-        parser.error("--tile-size must be positive")
     cv2.setNumThreads(4)
-    detector = YoloXDetector(args.model, args.confidence, tile_size=args.tile_size)
+    try:
+        detector = YoloXDetector(
+            args.model,
+            args.confidence,
+            tile_size=args.tile_size,
+            tile_confidence=args.tile_confidence,
+        )
+    except ValueError as error:
+        parser.error(str(error))
     print(
         json.dumps(
             {
                 "confidence": args.confidence,
                 "tile_size": args.tile_size,
+                "tile_confidence": args.tile_confidence,
                 **evaluate(args.archive, detector),
             },
             indent=2,

@@ -10,6 +10,36 @@ This benchmark measures YOLOX before tracking. It uses the 33 images in the fine
 
 The 640 px crops found 19 more small vehicles than the full-frame run at the same cutoff. They also added 33 false positives. Tiling stays opt-in. CPU timing uses four OpenCV threads and includes preprocessing and box decoding.
 
+## Calibrating the crop cutoff
+
+I used the 68 images with coarse annotations (`test_extra`) to choose the cutoff and the 33 fine-annotated images (`test`) to score the chosen settings. The precision floor was the full-frame baseline on the coarse split, 155 matches in 185 predictions (83.78%). Among settings that cleared the floor, I ranked by total matches, then small-vehicle matches, then precision.
+
+The sweep used 640 px crops. It tried full-view cutoffs of 0.35, 0.40, 0.45, and 0.50, crop cutoffs of 0.35, 0.45, 0.55, 0.65, and 0.75, crop box area caps of 32², 64², 96² pixels and no cap, and merge NMS IoUs of 0.35 and 0.45. The report lists all 160 combinations and evaluates only the selected settings and baselines on the fine split.
+
+| Split | Settings | Matched | False positives | Small boxes found | Precision | Recall |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Coarse | Full view 0.35 | 155/218 | 30 | 14/36 | 83.78% | 71.10% |
+| Coarse | Full view and crops 0.35 | 173/218 | 62 | 19/36 | 73.62% | 79.36% |
+| Coarse | Full view 0.35, crops 0.75 | 161/218 | 30 | 14/36 | 84.29% | 73.85% |
+| Coarse | Full view 0.35, crops 0.75, area cap 96² | 161/218 | 29 | 14/36 | 84.74% | 73.85% |
+| Fine | Full view 0.35 | 113/257 | 18 | 8/108 | 86.26% | 43.97% |
+| Fine | Full view and crops 0.35 | 149/257 | 51 | 27/108 | 74.50% | 57.98% |
+| Fine | Full view 0.35, crops 0.75 | 119/257 | 19 | 10/108 | 86.23% | 46.30% |
+| Fine | Full view 0.35, crops 0.75, area cap 96² | 118/257 | 18 | 10/108 | 86.76% | 45.91% |
+
+I kept the crop cutoff as an optional CLI setting. The fixed pixel area cap changed just one false positive and one match on the fine split, and its effect depends on camera resolution. The fine split had already been used to explore tiling and both splits come from Foggy Driving. Treat these results as a check on the cutoff choice. A camera-disjoint video set with labeled events is needed to measure how it transfers to the alert pipeline.
+
+To repeat the sweep, omit `--cuda` for OpenCV CPU inference. To score the chosen cutoff with the shipped detector, use the second command.
+
+```sh
+python -m benchmarks.foggy_driving.calibrate Foggy_Driving.zip object_detection_yolox_2022nov.onnx --cuda > calibration.json
+python -m benchmarks.foggy_driving.evaluate_boxes Foggy_Driving.zip object_detection_yolox_2022nov.onnx --confidence 0.35 --tile-size 640 --tile-confidence 0.75
+```
+
+The corresponding video CLI options are `--confidence 0.35 --detection-tile-size 640 --tile-confidence 0.75`.
+
+## NJIT fog video
+
 The original 360 × 240 NJIT fog video still missed its wrong-way event. The table includes the CPU rerun with 160 px tiles and two smaller-tile trials using the CUDA probe. None of the three runs supplied an observation within 12 px of the hand-traced vehicle at the seven sampled times.
 
 | Tile size | Confidence | Observations | Track IDs | Matched events |

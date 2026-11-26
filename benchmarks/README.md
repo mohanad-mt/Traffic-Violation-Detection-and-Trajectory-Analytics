@@ -42,4 +42,6 @@ The fog check used seven approximate points on the wrong-way vehicle. Neither mo
 
 On 33 fine-annotated images, full-frame YOLOX-S at 0.35 found 8 of 108 small vehicles. Lowering confidence to 0.20 found 13. Keeping confidence at 0.35 and adding 640 px crops found 27, with 51 false positives versus 18 for the baseline. The same approach with 160 px crops still missed the wrong-way event in the original NJIT fog video. [Scores and commands](foggy_driving/README.md)
 
+Calibrating the crop cutoff on the 68 coarse-annotated images selected 0.75 with the full view at 0.35. On the 33 fine-annotated images that found 119 of 257 vehicles with 19 false positives. Full-view inference alone found 113 with 18 false positives. The sweep also tested box area caps and merge IoU. [Calibration split, grid, and results](foggy_driving/README.md#calibrating-the-crop-cutoff)
+
 For a broader evaluation, annotate vehicles and event times across several fixed cameras, including distant vehicles in low contrast and a signalized clip with synchronized phases. AI City's 2021 anomaly track has timestamped stalls and crashes. [Dataset notes](https://www.aicitychallenge.org/2021-data-and-evaluation/#:~:text=Track%204%3A%20Traffic%20Anomaly%20Detection)

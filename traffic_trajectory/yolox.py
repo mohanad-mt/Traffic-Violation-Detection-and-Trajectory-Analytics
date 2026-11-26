@@ -28,14 +28,16 @@ class VehicleBox:
         return self.x + self.width / 2, self.y + self.height
 
 
-def _suppress(boxes: list[VehicleBox], confidence: float) -> list[VehicleBox]:
+def _suppress(
+    boxes: list[VehicleBox], confidence: float, overlap: float = NMS_IOU
+) -> list[VehicleBox]:
     if not boxes:
         return []
     keep = cv2.dnn.NMSBoxes(
         [(box.x, box.y, box.width, box.height) for box in boxes],
         [box.score for box in boxes],
         confidence,
-        NMS_IOU,
+        overlap,
     )
     return [boxes[index] for index in keep]
 
@@ -122,7 +124,15 @@ class YoloXDetector:
         roi: tuple[int, int, int, int] | None = None,
         *,
         tile_size: int | None = None,
+        tile_confidence: float | None = None,
     ) -> None:
+        if tile_size is not None and tile_size <= 0:
+            raise ValueError("detection tile size must be positive")
+        if tile_confidence is not None:
+            if tile_size is None:
+                raise ValueError("tile confidence requires a detection tile size")
+            if not 0 < tile_confidence < 1:
+                raise ValueError("tile confidence must be between 0 and 1")
         if not model_path.is_file():
             raise ValueError(f"YOLOX model file does not exist: {model_path}")
         self.net = cv2.dnn.readNetFromONNX(str(model_path))
@@ -131,9 +141,8 @@ class YoloXDetector:
             confidence if continuation_confidence is None else continuation_confidence
         )
         self.roi = roi
-        if tile_size is not None and tile_size <= 0:
-            raise ValueError("detection tile size must be positive")
         self.tile_size = tile_size
+        self.tile_confidence = tile_confidence
 
     def _window_boxes(self, frame: MatLike, window: tuple[int, int, int, int]) -> list[VehicleBox]:
         left, top, right, bottom = window
@@ -152,7 +161,7 @@ class YoloXDetector:
             for box in _suppress(boxes, self.continuation_confidence)
         ]
 
-    def predict_boxes(self, frame: MatLike) -> list[VehicleBox]:
+    def _frame_views(self, frame: MatLike) -> tuple[list[VehicleBox], list[VehicleBox] | None]:
         frame_height, frame_width = frame.shape[:2]
         roi = self.roi or (0, 0, frame_width, frame_height)
         left, top, right, bottom = roi
@@ -161,19 +170,29 @@ class YoloXDetector:
         boxes = self._window_boxes(frame, roi)
         size = self.tile_size
         if size is None or max(right - left, bottom - top) <= size:
-            return boxes
+            return boxes, None
 
-        # Keep the full view for vehicles that span more than one tile.
+        tile_boxes = []
         for offset_y in _tile_starts(bottom - top, size):
             for offset_x in _tile_starts(right - left, size):
                 x, y = left + offset_x, top + offset_y
                 window = (x, y, min(x + size, right), min(y + size, bottom))
-                boxes.extend(
+                tile_boxes.extend(
                     box
                     for box in self._window_boxes(frame, window)
                     if _interior_box(box, window, roi)
                 )
-        return _suppress(boxes, self.continuation_confidence)
+        return boxes, tile_boxes
+
+    def predict_boxes(self, frame: MatLike) -> list[VehicleBox]:
+        boxes, tile_boxes = self._frame_views(frame)
+        if tile_boxes is None:
+            return boxes
+
+        # Keep the full view for vehicles that span more than one tile.
+        if self.tile_confidence is not None:
+            tile_boxes = [box for box in tile_boxes if box.score > self.tile_confidence]
+        return _suppress([*boxes, *tile_boxes], self.continuation_confidence)
 
     def __call__(self, frame: MatLike) -> FrameDetections:
         boxes = self.predict_boxes(frame)

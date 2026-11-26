@@ -36,7 +36,7 @@ The tracker predicts each vehicle's next bottom center from its last two positio
 
 For YOLOX, `--continuation-confidence` lets a lower-score detection extend an existing track within half the normal distance gate. Only detections above `--confidence` can start a track. `--detection-roi LEFT TOP RIGHT BOTTOM` runs the detector on part of the frame. Keep the scene coordinates in full-frame pixels and leave room around vehicles at the crop edges.
 
-Use `--detection-tile-size 640` to add overlapping crops when distant vehicles are too small in the full view. The detector keeps the full-view pass and merges duplicate boxes. Crops can improve recall at the cost of runtime and extra detections. [Foggy Driving results](benchmarks/foggy_driving/README.md)
+Use `--detection-tile-size 640` to add overlapping crops when distant vehicles are too small in the full view. The detector keeps the full-view pass and merges duplicate boxes. Use `--tile-confidence` to require a higher score for crop boxes before merging. Crops can improve recall at the cost of runtime and extra detections. [Foggy Driving results](benchmarks/foggy_driving/README.md)
 
 ## Docker
 

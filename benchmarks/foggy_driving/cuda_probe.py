@@ -100,20 +100,26 @@ class TorchGraph:
         return values["output"].cpu().numpy()
 
 
+def load_cuda_graph(path: Path) -> TorchGraph:
+    if not torch.cuda.is_available():
+        raise ValueError("CUDA-enabled PyTorch and an available NVIDIA GPU are required")
+    with path.open("rb") as model_file:
+        if hashlib.file_digest(model_file, "sha256").hexdigest() != WEIGHT_SHA256:
+            raise ValueError("this probe only supports the documented OpenCV Zoo YOLOX-S weights")
+    torch.backends.cudnn.allow_tf32 = False
+    return TorchGraph(path)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Time the pinned YOLOX-S graph on CUDA.")
     parser.add_argument("archive", type=Path)
     parser.add_argument("model", type=Path)
     args = parser.parse_args()
-    if not torch.cuda.is_available():
-        parser.error("CUDA-enabled PyTorch and an available NVIDIA GPU are required")
-    with args.model.open("rb") as model_file:
-        if hashlib.file_digest(model_file, "sha256").hexdigest() != WEIGHT_SHA256:
-            parser.error("this probe only supports the documented OpenCV Zoo YOLOX-S weights")
-
     cv2.setNumThreads(4)
-    torch.backends.cudnn.allow_tf32 = False
-    graph = TorchGraph(args.model)
+    try:
+        graph = load_cuda_graph(args.model)
+    except (OSError, ValueError) as error:
+        parser.error(str(error))
     cpu = cv2.dnn.readNetFromONNX(str(args.model))
     with ZipFile(args.archive) as dataset:
         assets = sorted(

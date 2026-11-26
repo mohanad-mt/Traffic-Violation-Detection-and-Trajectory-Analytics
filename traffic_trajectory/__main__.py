@@ -36,6 +36,9 @@ def main() -> None:
         type=int,
         help="Also run YOLOX on overlapping square crops of this size in pixels",
     )
+    parser.add_argument(
+        "--tile-confidence", type=float, help="Additional minimum score for YOLOX crop boxes"
+    )
     parser.add_argument("--min-blob-area-px", type=int, default=100, help="Foreground area cutoff")
     parser.add_argument(
         "--track-distance-px", type=float, default=24, help="Tracker distance gate"
@@ -56,6 +59,11 @@ def main() -> None:
             parser.error("--detection-tile-size requires --model")
         if args.detection_tile_size <= 0:
             parser.error("--detection-tile-size must be positive")
+    if args.tile_confidence is not None:
+        if args.detection_tile_size is None:
+            parser.error("--tile-confidence requires --detection-tile-size")
+        if not 0 < args.tile_confidence < 1:
+            parser.error("--tile-confidence must be between 0 and 1")
 
     try:
         if args.scenario == "-":
@@ -94,6 +102,7 @@ def main() -> None:
                         args.continuation_confidence,
                         roi,
                         tile_size=args.detection_tile_size,
+                        tile_confidence=args.tile_confidence,
                     )
                 else:
                     detect = foreground_detector(args.background, args.min_blob_area_px)
