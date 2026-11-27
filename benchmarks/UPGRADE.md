@@ -187,6 +187,28 @@ python -m benchmarks.road_validation.aicity21_stop build/aicity21-track4-train-d
 python -m benchmarks.road_validation.aicity21_background build/aicity21-track4-train-data/1.mp4 build/assets/rf-detr-small.pth --clip 1 --device cuda
 ```
 
+### RoadTrack live stop comparison
+
+RoadTrack tracks vehicles on the projected road surface and estimates ground speed with a Kalman filter. I ran the original event detector and evaluator at the authors' published revision. The checkout contains 201 positive and 800 negative sequence entries across six fixed cameras, with 311 labeled vehicles in the positive clips. Six negative detection files are empty. The remaining negatives provide 19.85 camera-hours of replay. Both pipelines used the released YOLO11m detections at 10 FPS and the authors' exclusion rectangles. RoadTrack also used its camera homographies. The project replay used ByteTrack with a 0.30 activation threshold and the existing 3 s, 4 px stop rule. Inference from raw video is outside this comparison. [Paper](https://doi.org/10.1007/s11760-026-05148-1) · [Author release](https://github.com/corfyi/RoadTrack/tree/1a72b2613cf4e06725ba25d72ca7aaddb6338772)
+
+The shared alert score matches each first confirmation to one labeled vehicle if the boxes overlap by at least 0.5 IoU on that frame. An alert before the labeled interval, outside the interval, or on a different vehicle is unmatched. A RoadTrack alert track is counted again after a gap over 2 s. Delays are relative to the first labeled frame and summarized over the matches for each method.
+
+| Detector | Matches | Unmatched alerts | Missed labels | Precision | Recall | F1 | Negative alerts / hour | Median matched delay |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| ByteTrack + pixel stop rule | 229 | 729 | 82 | 23.9% | 73.6% | 0.361 | 2.12 | 6.3 s |
+| RoadTrack | 190 | 296 | 121 | 39.1% | 61.1% | 0.477 | 0.30 | 4.7 s |
+
+The 24-sequence pilot used the first two positives and negatives per camera. Its F1 was 0.750 for RoadTrack and 0.537 for the pixel rule. On the full release, RoadTrack produced fewer unmatched alerts on every camera. K287 and K295 account for 40 fewer matched vehicles combined. In 119 of RoadTrack's 121 misses under the shared rule, an alerting track fired before the labeled interval and later overlapped the labeled vehicle by at least 0.5 IoU. The other two had no later overlap. The 10 km/h speed cutoff can trigger before a vehicle comes to a full stop. The authors' own trajectory-coverage evaluator produced 0.956 F1 and 2.91 s mean latency for RoadTrack. Those values use their matching rules and are kept separately from the first-confirmation scores. [Run record](runs/roadtrack.json)
+
+RoadTrack is the baseline for improving precision in the live stop path. The next alert evaluation should measure how early a warning can arrive and still be useful, using the same time window for both methods. The six-camera replay reuses the release's detections and calibration. A raw-video evaluation on held-out cameras should confirm whether those gains carry over.
+
+```sh
+git clone https://github.com/corfyi/RoadTrack.git build/upstream-roadtrack
+git -C build/upstream-roadtrack checkout 1a72b2613cf4e06725ba25d72ca7aaddb6338772
+python -m pip install -r requirements-trackers.txt filterpy==1.4.5 lap==0.5.13 supervision==0.32.3 scipy==1.18.1
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m benchmarks.road_validation.roadtrack build/upstream-roadtrack --per-camera 0 --jobs 8
+```
+
 ## Reproduce
 
 Install the optional packages described in the [README](../README.md#detectors-and-trackers). Obtain the pinned weights and evaluation inputs.
