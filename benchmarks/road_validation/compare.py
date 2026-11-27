@@ -10,7 +10,7 @@ from time import perf_counter
 import cv2
 
 from benchmarks.assets import sha256
-from traffic_trajectory.detection import BoxDetector, make_detector
+from traffic_trajectory.detection import DETECTORS, BoxDetector, make_detector
 from traffic_trajectory.detector import detect_events
 from traffic_trajectory.evaluate import evaluate
 from traffic_trajectory.geometry import VehicleBox
@@ -139,7 +139,7 @@ def main() -> None:
     parser.add_argument("model", type=Path)
     parser.add_argument("road_folder", type=Path)
     parser.add_argument("night_video", type=Path)
-    parser.add_argument("--detector", choices=("yolox", "rtdetr"), default="yolox")
+    parser.add_argument("--detector", choices=DETECTORS, default="yolox")
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     parser.add_argument("--input-color", choices=("rgb", "bgr"), default="rgb")
     parser.add_argument(

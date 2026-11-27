@@ -19,7 +19,7 @@ from pycocotools.cocoeval import COCOeval
 from benchmarks.assets import sha256
 from benchmarks.dawn import fog_examples
 from benchmarks.foggy_driving.evaluate_boxes import BoxCounts, examples
-from traffic_trajectory.detection import VehicleBox, make_detector
+from traffic_trajectory.detection import DETECTORS, VehicleBox, make_detector
 
 CATEGORIES = {name: index for index, name in enumerate(("car", "truck", "bus", "motorcycle"), 1)}
 COCO_METRICS = (
@@ -167,7 +167,7 @@ def main() -> None:
     parser.add_argument("model", type=Path)
     parser.add_argument("--dataset", choices=("foggy-driving", "dawn-fog"), required=True)
     parser.add_argument("--split", choices=("test", "test_extra"), default="test")
-    parser.add_argument("--detector", choices=("yolox", "rtdetr"), default="yolox")
+    parser.add_argument("--detector", choices=DETECTORS, default="yolox")
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     parser.add_argument("--input-color", choices=("rgb", "bgr"), default="rgb")
     parser.add_argument("--tile-size", type=int)

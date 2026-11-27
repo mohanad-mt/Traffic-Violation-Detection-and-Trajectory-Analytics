@@ -21,8 +21,10 @@ def main() -> None:
     )
     detector_args = parser.add_mutually_exclusive_group()
     detector_args.add_argument("--background", type=Path, help="Empty-road reference image")
-    detector_args.add_argument("--model", type=Path, help="ONNX file or local RT-DETR checkpoint")
-    parser.add_argument("--detector", choices=("yolox", "rtdetr"), default="yolox")
+    detector_args.add_argument(
+        "--model", type=Path, help="Local model weights or checkpoint directory"
+    )
+    parser.add_argument("--detector", choices=("yolox", "rtdetr", "rfdetr"), default="yolox")
     parser.add_argument(
         "--device", choices=("cpu", "cuda"), default="cpu", help="Neural inference device"
     )
@@ -33,27 +35,27 @@ def main() -> None:
         help="Use bgr for upstream YOLOX exports and rgb for OpenCV Zoo",
     )
     parser.add_argument(
-        "--confidence", type=float, default=0.35, help="YOLOX confidence threshold"
+        "--confidence", type=float, default=0.35, help="Detector score cutoff for starting a track"
     )
     parser.add_argument(
         "--continuation-confidence",
         type=float,
-        help="Lower YOLOX cutoff for extending existing tracks",
+        help="Lower detector cutoff for extending existing tracks",
     )
     parser.add_argument(
         "--detection-roi",
         nargs=4,
         type=int,
         metavar=("LEFT", "TOP", "RIGHT", "BOTTOM"),
-        help="Run YOLOX on a rectangle in video pixels",
+        help="Run the detector on a rectangle in video pixels",
     )
     parser.add_argument(
         "--detection-tile-size",
         type=int,
-        help="Also run YOLOX on overlapping square crops of this size in pixels",
+        help="Also run the detector on overlapping square crops of this size in pixels",
     )
     parser.add_argument(
-        "--tile-confidence", type=float, help="Additional minimum score for YOLOX crop boxes"
+        "--tile-confidence", type=float, help="Additional minimum score for crop boxes"
     )
     parser.add_argument("--min-blob-area-px", type=int, default=100, help="Foreground area cutoff")
     parser.add_argument(
@@ -77,8 +79,8 @@ def main() -> None:
         parser.error("box tracking requires --model")
     if args.model is None and (args.device != "cpu" or args.yolox_input_color != "rgb"):
         parser.error("--device cuda and --yolox-input-color bgr require --model")
-    if args.detector == "rtdetr" and (args.model is None or args.yolox_input_color != "rgb"):
-        parser.error("--detector rtdetr requires --model and uses RGB inputs")
+    if args.detector != "yolox" and (args.model is None or args.yolox_input_color != "rgb"):
+        parser.error(f"--detector {args.detector} requires --model and uses RGB inputs")
     if args.continuation_confidence is not None:
         if args.model is None:
             parser.error("--continuation-confidence requires --model")

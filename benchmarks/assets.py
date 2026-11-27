@@ -10,6 +10,16 @@ RTDETR = (
     "https://huggingface.co/PekingU/rtdetr_r18vd/resolve/ac77a11ff0170a41b771c03264987f8ce2b0d753/"
 )
 ASSETS = {
+    "rfdetr-small": (
+        "rf-detr-small.pth",
+        "https://repo.roboflow.com/rfdetr/small_coco/checkpoint_best_regular.pth",
+        "d81979a9213a2109345158ce9232668df4c1ae52e9b8db3f2ec0a8cbad959b33",
+    ),
+    "tapnextpp-512": (
+        "tapnextpp_512.ckpt",
+        "https://storage.googleapis.com/gresearch/tapnextpp/tapnextpp_512.ckpt",
+        "6cd0e793fdcface3063d63f8ed3819bcf74c2c0468fe1fef85acee4de2f3609f",
+    ),
     "dawn-fog": (
         "DAWN-Fog.zip",
         "https://data.mendeley.com/public-files/datasets/766ygrbt8y/files/"

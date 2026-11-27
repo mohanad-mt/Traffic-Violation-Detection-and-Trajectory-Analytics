@@ -27,6 +27,7 @@ Use a constant-frame-rate clip and a [scene JSON](examples/video.scene.json) wit
 
 - `--model` takes a local YOLOX ONNX file. The default RGB preprocessing works with the full-precision OpenCV Zoo YOLOX-S export. Use `--yolox-input-color bgr` for the upstream YOLOX-M export. [Zoo checkpoint](https://huggingface.co/opencv/opencv_zoo/tree/main/models/object_detection_yolox) · [Upstream weights](https://github.com/Megvii-BaseDetection/YOLOX/blob/main/demo/ONNXRuntime/README.md)
 - `--detector rtdetr --model build/assets/rtdetr-r18` uses a local RT-DETR checkpoint. Fetch the pinned files with `python -m benchmarks.assets build/assets rtdetr-config rtdetr-processor rtdetr-weights`.
+- `--detector rfdetr --model build/assets/rf-detr-small.pth` uses RF-DETR-S. Fetch it with `python -m benchmarks.assets build/assets rfdetr-small`. [Comparison on fog images and road clips](benchmarks/UPGRADE.md#rf-detr-small)
 - `--background empty-road.png` compares each frame against an empty-road image from the same camera and resolution. Shadows, lighting changes, and other objects can show up as foreground detections.
 
 ```sh
@@ -52,6 +53,16 @@ python -m traffic_trajectory scene.json --video clip.mp4 --model object_detectio
 ```
 
 For a joint detector/tracker environment install `requirements-trackers.txt` first, then add `onnxruntime-gpu==1.32.0 transformers==5.17.0` and the PyTorch wheels above. RT-DETR uses PyTorch directly. The CPU image and baseline tests use the headless OpenCV wheel. [CUDA provider documentation](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html)
+
+RF-DETR also uses PyTorch directly. Install the CUDA PyTorch wheels above, then install `requirements-rfdetr.txt` alongside `requirements-trackers.txt` for box tracking. Use `requirements-video.txt` in place of the tracker requirements for point tracking.
+
+```sh
+python -m pip install -r requirements-trackers.txt -r requirements-rfdetr.txt
+python -m benchmarks.assets build/assets rfdetr-small
+python -m traffic_trajectory scene.json --video clip.mp4 --model build/assets/rf-detr-small.pth --detector rfdetr --device cuda --tracker bytetrack --confidence .20 --continuation-confidence .03 --include-tracks
+```
+
+The detector and tracker settings above recovered the development fog alert. Check the score thresholds on footage from the target camera before deploying them.
 
 ### Incremental output and video overlays
 

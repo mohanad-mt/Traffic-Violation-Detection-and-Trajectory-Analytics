@@ -51,6 +51,64 @@ On the original NJIT fog clip, no YOLOX-S or YOLOX-M box at the 0.03 cache floor
 
 The actual video executable uses ONNX Runtime CUDA for YOLOX. With FP32 and TF32 disabled, the largest raw output difference on the checked red clip frame was 0.000064. Both backends produced 294 observations, 21 tracks and the same red crossing within 1 ms. On the 33-frame 480 × 270 clip, the mean detector time was 242.4 ms on OpenCV CPU and 8.5 ms on the RTX 5090. End-to-end processing was 4.1 and 111.4 FPS after warm-up. The rates exclude model loading and are local short-clip measurements.
 
+## RF-DETR Small
+
+I ran the released 512 px COCO checkpoint on the same 300 DAWN fog images and replayed its boxes through the existing tracker and event rules. The benchmark used FP32 PyTorch on the RTX 5090. The checkpoint and package version are pinned. Detector timings include preprocessing and box conversion, with a five-call warm-up and no video decode. The reference timings are from the earlier run on the same machine. [Model and weights](https://github.com/roboflow/rf-detr) · [Run details](runs/rfdetr-small.json)
+
+| Detector | DAWN AP50–95 | AP50 | Small AP | Small AR | Mean | P95 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| YOLOX-M | 54.18 | 82.92 | 26.66 | 39.93 | 12.4 ms | 13.8 ms |
+| RT-DETR-R18 | 49.26 | 71.59 | 21.81 | 38.81 | 20.2 ms | 27.6 ms |
+| RF-DETR-S | 55.83 | 84.39 | 26.54 | 43.93 | 12.2 ms | 16.9 ms |
+
+At a score cutoff of 0.50, RF-DETR-S matched 1,186 boxes with 68 false positives at IoU 0.50. YOLOX-M matched 1,159 with 64 false positives at that cutoff. Both matched 66 of the 270 small boxes. Lowering RF-DETR-S to 0.20 found 380 more boxes and added 993 false positives. This is a box-level comparison on DAWN. I evaluated the event thresholds separately using footage.
+
+| Development replay | TP | FP | FN | F1 | Matched |
+| --- | ---: | ---: | ---: | ---: | --- |
+| RT-DETR-R18, OC-SORT, 0.20 | 2 | 0 | 2 | 0.67 | Stop, red |
+| RF-DETR-S, OC-SORT, 0.20 | 2 | 0 | 2 | 0.67 | Stop, red |
+| RF-DETR-S, ByteTrack, 0.20 start / 0.03 continuation | 3 | 1 | 1 | 0.75 | Fog, stop, red |
+
+In the fog clip, RF-DETR-S put a box within 12 px of the reference at seven of seven sampled times above 0.03, with two above 0.20. The ByteTrack run confirmed the wrong-way event at 3.73 s. The fixed OC-SORT setting missed that event with both detectors. Applying a lane crop with 24 px of padding to RF-DETR-S and ByteTrack missed both the fog and shadow references. The full-frame ByteTrack and OC-SORT settings also missed both nighttime transfer events and triggered zero alerts on those two short clips. Across the four sampled positions per nighttime clip, the strongest nearby RF-DETR scores were 0.198 on Camera 1 and 0.089 on Camera 2. [Nighttime transfer footage](night_transfer/README.md)
+
+The extra stop alert came from the same ID as the matched alert. The vehicle's bottom-center estimate drifted roughly 4 px from the beginning of the first stationary window, which the default 4 px radius initially accepted. Replaying the same boxes at a 2 px radius matched the stop once, with an estimated onset of 4.27 s and no extra alert. Three intermediate radii produced onsets outside the fixed tolerance. This sweep is camera-specific, and there is only one positive stop clip.
+
+RF-DETR-S is available through `--detector rfdetr`. The model recovered the fog alert on development footage, and the stop and nighttime results require more camera-specific evidence before choosing a general default.
+
+### Reproduce the RF-DETR run
+
+Follow the [CUDA and RF-DETR setup](../README.md#cuda-setup) and prepare the road and night clips below. Install `pycocotools==2.0.11` in the same environment for image scoring.
+
+```sh
+python -m benchmarks.assets build/assets dawn-fog rfdetr-small
+python -m benchmarks.compare_detectors dawn-rfdetr-small build/assets/DAWN-Fog.zip build/assets/rf-detr-small.pth --dataset dawn-fog --device cuda --detector rfdetr
+python -m benchmarks.road_validation.compare build/assets/rf-detr-small.pth build/road build/nighttime/sample.avi --device cuda --detector rfdetr --tracker point bytetrack ocsort --cache-dir build/road/boxes-rfdetr
+```
+
+To repeat the transfer check, use the [nighttime commands](night_transfer/README.md) with the RF-DETR checkpoint and `--detector rfdetr --confidence .20`. Run once with `--tracker ocsort` and once with `--tracker bytetrack --continuation-confidence .03`. For the development lane crop, use `--detection-roi 74 103 218 240` on the fog clip and `--detection-roi 34 72 256 240` on the shadow clip. The stop radius uses the `stopped_radius_px` scene threshold.
+
+### Point tracking from a known sighting
+
+I tested whether a point tracker could follow a vehicle once its position was known. TAPNext++ processed frames in order from the first labeled sighting, with a single query on the bottom-center annotation or 3 px above it. For the raised seed, I added the same offset back to compare predictions with the bottom-center references. A hit requires a visible prediction within 12 px at a later labeled time. The red sedan is the visible control. The stationary baseline keeps the original labeled position. [TAPNext++ release](https://github.com/google-deepmind/tapnet/tree/ceedd60bb9f6c9f7c74796e4445aff6c6ddf7c9b/tapnet/tapnextpp/votsp2026)
+
+| Clip | Later reference points | Stationary baseline | Seed at bottom center | Seed 3 px above |
+| --- | ---: | ---: | ---: | ---: |
+| Fog | 6 | 1 | 1 | 1 |
+| Red | 5 | 0 | 5 | 5 |
+| Night camera 1 | 3 | 0 | 0 | 0 |
+| Night camera 2 | 3 | 0 | 0 | 3 |
+
+On Camera 2, the raised seed followed the vehicle to within 0.7–7.8 px at the three checkpoints. Both seeds stayed near their initial position on Camera 1 even though the model marked them visible. The later frames averaged about 33 ms each on the RTX 5090. This was a diagnostic with a hand-labeled first sighting. An automatic trial needs a reliable seed from the detector, new raw camera views with vehicle trajectories, and longer negative clips to measure how often the tracker follows the wrong object.
+
+Install `einops==0.8.0` in the CUDA PyTorch environment. Use the pinned source checkout and put its root on `PYTHONPATH`. The optional checkpoint is 2.53 GB.
+
+```sh
+git clone https://github.com/google-deepmind/tapnet.git build/tapnet
+git -C build/tapnet checkout ceedd60bb9f6c9f7c74796e4445aff6c6ddf7c9b
+python -m benchmarks.assets build/assets tapnextpp-512
+PYTHONPATH=build/tapnet python -m benchmarks.road_validation.point_propagation build/assets/tapnextpp_512.ckpt build/road build/independent
+```
+
 ## Reproduce
 
 Install the optional packages described in the [README](../README.md#detectors-and-trackers). Obtain the pinned weights and evaluation inputs.

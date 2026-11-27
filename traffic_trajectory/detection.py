@@ -9,6 +9,7 @@ from .geometry import VehicleBox as VehicleBox
 from .tracker import FrameDetections
 
 NMS_IOU = 0.45
+DETECTORS = ("yolox", "rtdetr", "rfdetr")
 
 
 def _suppress(
@@ -141,6 +142,10 @@ def make_detector(
         from .rtdetr import RTDetrDetector
 
         return RTDetrDetector(model, confidence, continuation_confidence, roi, **options)
+    if name == "rfdetr":
+        from .rfdetr import RFDetrDetector
+
+        return RFDetrDetector(model, confidence, continuation_confidence, roi, **options)
     if name == "yolox":
         from .yolox import YoloXDetector
 
