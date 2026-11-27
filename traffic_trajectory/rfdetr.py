@@ -20,13 +20,14 @@ class RFDetrDetector(BoxDetector):
         tile_size: int | None = None,
         tile_confidence: float | None = None,
         device: str = "cpu",
+        large: bool = False,
     ) -> None:
         super().__init__(confidence, continuation_confidence, roi, tile_size, tile_confidence)
         if not model_path.is_file():
-            raise ValueError("RF-DETR requires a local Small checkpoint file")
+            raise ValueError("RF-DETR requires a local checkpoint file matching the selected size")
         try:
             import torch
-            from rfdetr import RFDETRSmall
+            from rfdetr import RFDETRLarge, RFDETRSmall
             from rfdetr.assets.coco_classes import COCO_CLASSES
         except ImportError as error:
             raise ValueError("RF-DETR requires requirements-rfdetr.txt") from error
@@ -40,7 +41,8 @@ class RFDetrDetector(BoxDetector):
         }
         # RF-DETR sends checkpoint setup logs to stdout. Keep command output as JSON.
         with redirect_stdout(sys.stderr):
-            model = RFDETRSmall(pretrain_weights=str(model_path.resolve()), device=device)
+            load_model = RFDETRLarge if large else RFDETRSmall
+            model = load_model(pretrain_weights=str(model_path.resolve()), device=device)
             self.predictor = model.inference(compile=False)
 
     def _crop_boxes(self, frame: MatLike) -> list[VehicleBox]:

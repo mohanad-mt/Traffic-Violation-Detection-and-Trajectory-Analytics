@@ -13,6 +13,7 @@ from .streaming import StreamingEvents
 from .tracker import FrameDetections, make_tracker
 
 type FrameDetector = Callable[[MatLike], FrameDetections]
+type TimedFrame = tuple[float, MatLike]
 
 
 def foreground_detector(background_path: Path, min_area_px: int) -> FrameDetector:
@@ -71,6 +72,61 @@ def decoded_frames(capture: cv2.VideoCapture, *, strict_length: bool = False) ->
         raise ValueError(f"video ended after {read} frames, expected {expected:g}")
 
 
+def _presentation_frames(container, stream, strict_length: bool) -> Iterator[TimedFrame]:
+    origin = None
+    previous = -1.0
+    read = 0
+    for frame in container.decode(stream):
+        if frame.pts is None or frame.time_base is None:
+            raise ValueError(f"frame {read} has no presentation timestamp")
+        pts = frame.pts * frame.time_base
+        if origin is None:
+            origin = pts
+        timestamp_s = float(pts - origin)
+        if not isfinite(timestamp_s) or timestamp_s <= previous:
+            raise ValueError(f"frame {read} presentation timestamp is not strictly increasing")
+        yield timestamp_s, frame.to_ndarray(format="bgr24")
+        previous = timestamp_s
+        read += 1
+    if read == 0:
+        raise ValueError("video has no decodable frames")
+    if strict_length and stream.frames > 0 and read < stream.frames:
+        raise ValueError(f"video ended after {read} frames, expected {stream.frames}")
+
+
+@contextmanager
+def timed_video(
+    path: Path, *, timestamp_source: str = "fps", strict_length: bool = False
+) -> Iterator[tuple[float, Iterator[TimedFrame]]]:
+    """Yield nominal FPS and BGR frames timestamped relative to the first frame."""
+    if timestamp_source == "fps":
+        with open_video(path) as (capture, fps):
+            frames = decoded_frames(capture, strict_length=strict_length)
+            yield fps, ((index / fps, frame) for index, frame in enumerate(frames))
+        return
+    if timestamp_source != "pts":
+        raise ValueError(f"unknown timestamp source: {timestamp_source}")
+    if not path.is_file():
+        raise ValueError(f"video file does not exist: {path}")
+    try:
+        import av
+    except ImportError as error:
+        raise ValueError(
+            "presentation timestamps require PyAV (requirements-video.txt)"
+        ) from error
+    try:
+        with av.open(str(path)) as container:
+            if not container.streams.video:
+                raise ValueError(f"no video stream in {path}")
+            stream = container.streams.video[0]
+            fps = float(stream.average_rate or stream.guessed_rate or 0)
+            if not isfinite(fps) or fps <= 0:
+                raise ValueError("the video must report a positive nominal frame rate")
+            yield fps, _presentation_frames(container, stream, strict_length)
+    except av.FFmpegError as error:
+        raise ValueError(f"cannot decode video {path}: {error}") from error
+
+
 def track_video(
     path: Path,
     detect: FrameDetector,
@@ -80,11 +136,15 @@ def track_video(
     tracker_name: str = "point",
     confidence: float = 0.35,
     strict_length: bool = False,
+    timestamp_source: str = "fps",
 ) -> tuple[Track, ...]:
-    with open_video(path) as (capture, fps):
+    with timed_video(path, timestamp_source=timestamp_source, strict_length=strict_length) as (
+        fps,
+        frames,
+    ):
         tracker = make_tracker(tracker_name, fps, max_gap_s, max_distance_px, confidence)
-        for frame_index, frame in enumerate(decoded_frames(capture, strict_length=strict_length)):
-            tracker.update_frame(frame_index / fps, detect(frame))
+        for timestamp_s, frame in frames:
+            tracker.update_frame(timestamp_s, detect(frame))
     return tracker.tracks()
 
 
@@ -97,9 +157,13 @@ def stream_video_events(
     tracker_name: str = "point",
     confidence: float = 0.35,
     strict_length: bool = False,
+    timestamp_source: str = "fps",
 ) -> Iterator[Event]:
     state = StreamingEvents(scenario)
-    with open_video(path) as (capture, fps):
+    with timed_video(path, timestamp_source=timestamp_source, strict_length=strict_length) as (
+        fps,
+        frames,
+    ):
         tracker = make_tracker(
             tracker_name,
             fps,
@@ -108,6 +172,5 @@ def stream_video_events(
             confidence,
             keep_history=False,
         )
-        for index, frame in enumerate(decoded_frames(capture, strict_length=strict_length)):
-            time = index / fps
+        for time, frame in frames:
             yield from state.update(time, tracker.update_frame(time, detect(frame)))

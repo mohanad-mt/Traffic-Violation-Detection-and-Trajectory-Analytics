@@ -2,7 +2,13 @@ from collections import defaultdict
 from dataclasses import dataclass
 from math import dist
 
-from .detector import Event, RedLightState, StoppedVehicleEvent, WrongWayState
+from .detector import (
+    Event,
+    RedLightState,
+    StoppedVehicleEvent,
+    WrongWayState,
+    stop_window_is_ready,
+)
 from .scenario import LaneZone, Observation, Scenario, Thresholds
 
 
@@ -27,10 +33,7 @@ class StationaryState:
             self.anchor = sample
             self.confirmed = False
         self.last = sample
-        if (
-            not self.confirmed
-            and sample.timestamp_s - self.anchor.timestamp_s >= thresholds.stopped_duration_s
-        ):
+        if not self.confirmed and stop_window_is_ready(self.anchor, sample, thresholds):
             self.confirmed = True
             return True
         return False

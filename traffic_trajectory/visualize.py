@@ -3,6 +3,9 @@
 import argparse
 import json
 from collections import defaultdict, deque
+from contextlib import contextmanager
+from fractions import Fraction
+from itertools import chain
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from zlib import crc32
@@ -13,7 +16,7 @@ from cv2.typing import MatLike
 
 from .geometry import Point
 from .scenario import Observation, Scenario, _parse_track, parse_scenario
-from .video import decoded_frames, open_video
+from .video import timed_video
 
 COLORS = ((252, 194, 90), (100, 225, 250), (96, 220, 138), (224, 157, 245), (151, 193, 255))
 
@@ -62,23 +65,25 @@ def _geometry(frame: MatLike, scenario: Scenario, timestamp_s: float) -> None:
 
 
 class Overlay:
-    def __init__(self, predictions: dict, fps: float, title: str) -> None:
+    def __init__(self, predictions: dict, time_scale: float, title: str) -> None:
         self.title = title
+        self.time_scale = time_scale
         if "tracks" not in predictions:
             raise ValueError("rendering requires predictions generated with --include-tracks")
         self.observations = defaultdict(list)
         for index, raw in enumerate(predictions["tracks"]):
             track = _parse_track(raw, f"tracks[{index}]")
             for sample in track.observations:
-                self.observations[round(sample.timestamp_s * fps)].append((track.id, sample))
+                self.observations[round(sample.timestamp_s * time_scale)].append(
+                    (track.id, sample)
+                )
         self.events = predictions["events"]
         self.tails: dict[str, deque[tuple[float, Point]]] = {}
 
-    def draw(self, frame: MatLike, index: int, fps: float, scenario: Scenario) -> MatLike:
+    def draw(self, frame: MatLike, t: float, scenario: Scenario) -> MatLike:
         frame = frame.copy()
-        t = index / fps
         _geometry(frame, scenario, t)
-        for track_id, sample in self.observations.get(index, []):
+        for track_id, sample in self.observations.get(round(t * self.time_scale), []):
             self._draw_sample(frame, track_id, sample, t)
         self.tails = {key: tail for key, tail in self.tails.items() if t - tail[-1][0] <= 2}
         _text(frame, f"{self.title}  {t:.2f}s", (8, 17))
@@ -119,34 +124,61 @@ class Overlay:
         _text(frame, text, (max(0, anchor[0]), max(12, anchor[1] - 3)))
 
 
+@contextmanager
+def _video_writer(path: Path, fps: float, size: tuple[int, int], source: str):
+    if source == "fps":
+        writer = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"mp4v"), fps, size)
+        try:
+            if not writer.isOpened():
+                raise ValueError("could not open an MP4 video writer")
+            yield lambda image, _time: writer.write(image)
+        finally:
+            writer.release()
+        return
+
+    import av
+
+    try:
+        with av.open(str(path), mode="w") as output:
+            stream = output.add_stream("libx264", rate=Fraction(fps).limit_denominator(1001))
+            stream.width, stream.height = size
+            stream.pix_fmt = "yuv420p" if all(length % 2 == 0 for length in size) else "yuv444p"
+            time_base = Fraction(1, 1_000_000)
+            stream.time_base = stream.codec_context.time_base = time_base
+
+            def write(image: MatLike, time: float) -> None:
+                frame = av.VideoFrame.from_ndarray(image, format="bgr24")
+                frame.pts = round(time / time_base)
+                frame.time_base = time_base
+                output.mux(stream.encode(frame))
+
+            yield write
+            output.mux(stream.encode())
+    except av.FFmpegError as error:
+        raise ValueError(f"could not encode the timestamped overlay: {error}") from error
+
+
 def render(
     video: Path, scenario: Scenario, predictions: list[tuple[str, dict]], destination: Path
 ) -> None:
     if destination.resolve() == video.resolve() or destination.suffix.lower() != ".mp4":
         raise ValueError("choose a separate .mp4 output path")
+    sources = {data.get("timestamp_source", "fps") for _, data in predictions}
+    if len(sources) != 1:
+        raise ValueError("comparison predictions must use the same timestamp source")
+    source = sources.pop()
     with NamedTemporaryFile(dir=destination.parent, suffix=".mp4", delete=False) as temp:
         writing = Path(temp.name)
     try:
-        with open_video(video) as (capture, fps):
-            overlays = [Overlay(data, fps, title) for title, data in predictions]
-            frames = decoded_frames(capture, strict_length=True)
+        with timed_video(video, timestamp_source=source, strict_length=True) as (fps, frames):
+            time_scale = 1_000_000 if source == "pts" else fps
+            overlays = [Overlay(data, time_scale, title) for title, data in predictions]
             first = next(frames)
-            height, width = first.shape[:2]
-            writer = cv2.VideoWriter(
-                str(writing), cv2.VideoWriter_fourcc(*"mp4v"), fps, (width * len(overlays), height)
-            )
-            try:
-                if not writer.isOpened():
-                    raise ValueError("could not open an MP4 video writer")
-                frame = first
-                index = 0
-                while frame is not None:
-                    images = [overlay.draw(frame, index, fps, scenario) for overlay in overlays]
-                    writer.write(images[0] if len(images) == 1 else np.hstack(images))
-                    frame = next(frames, None)
-                    index += 1
-            finally:
-                writer.release()
+            height, width = first[1].shape[:2]
+            with _video_writer(writing, fps, (width * len(overlays), height), source) as write:
+                for time, frame in chain((first,), frames):
+                    images = [overlay.draw(frame, time, scenario) for overlay in overlays]
+                    write(images[0] if len(images) == 1 else np.hstack(images), time)
         writing.replace(destination)
     finally:
         writing.unlink(missing_ok=True)

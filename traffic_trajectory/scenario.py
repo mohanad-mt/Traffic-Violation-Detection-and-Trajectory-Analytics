@@ -50,6 +50,7 @@ class Thresholds:
     stopped_radius_px: float = 4.0
     stopped_realert_gap_s: float = 2.0
     red_line_margin_px: float = 2.0
+    max_stopped_drift_px_s: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -154,6 +155,7 @@ def _parse_thresholds(value: object) -> Thresholds:
     for name, number in values.items():
         if name in {
             "max_pause_s",
+            "max_stopped_drift_px_s",
             "red_line_margin_px",
             "stopped_realert_gap_s",
             "min_reverse_speed_px_s",

@@ -116,6 +116,16 @@ def detect_wrong_way(scenario: Scenario) -> list[WrongWayEvent]:
     return sorted(events, key=lambda event: (event.confirmed_s, event.track_id))
 
 
+def stop_window_is_ready(
+    anchor: Observation, current: Observation, thresholds: Thresholds
+) -> bool:
+    elapsed = current.timestamp_s - anchor.timestamp_s
+    max_drift = thresholds.max_stopped_drift_px_s
+    return elapsed >= thresholds.stopped_duration_s and (
+        max_drift == 0 or dist(anchor.position, current.position) <= max_drift * elapsed
+    )
+
+
 @dataclass(frozen=True)
 class _StopRun:
     track_id: str
@@ -147,10 +157,7 @@ def _stationary_runs(track: Track, zone: LaneZone, thresholds: Thresholds) -> It
         if anchor is None:
             anchor = sample
         last = sample
-        if (
-            confirmed_s is None
-            and last.timestamp_s - anchor.timestamp_s >= thresholds.stopped_duration_s
-        ):
+        if confirmed_s is None and stop_window_is_ready(anchor, last, thresholds):
             confirmed_s = last.timestamp_s
 
     if anchor is not None:

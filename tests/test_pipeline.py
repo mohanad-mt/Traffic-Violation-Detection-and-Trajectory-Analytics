@@ -4,6 +4,8 @@ import os
 import subprocess
 import sys
 import unittest
+from dataclasses import asdict, replace
+from fractions import Fraction
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import Mock, patch
@@ -117,6 +119,67 @@ class EvaluationTests(unittest.TestCase):
 
 @unittest.skipUnless(VIDEO_INSTALLED, "install requirements-video.txt for video tests")
 class VideoTests(unittest.TestCase):
+    @unittest.skipUnless(importlib.util.find_spec("av"), "requires PyAV")
+    def test_variable_frame_timing_reaches_tracks_alerts_and_overlay(self):
+        import av
+        import numpy as np
+
+        from traffic_trajectory.detector import detect_events
+        from traffic_trajectory.scenario import parse_scenario, track_record
+        from traffic_trajectory.tracker import FrameDetections
+        from traffic_trajectory.video import stream_video_events, timed_video, track_video
+        from traffic_trajectory.visualize import render
+
+        scene = parse_scenario(
+            {
+                "lane": {
+                    "id": "road",
+                    "polygon": [[0, 0], [150, 0], [150, 40], [0, 40]],
+                    "forward": [1, 0],
+                },
+                "tracks": [],
+            }
+        )
+        positions = [120, 116, 104, 88, 72]
+
+        def detector():
+            points = iter(positions)
+            return lambda frame: FrameDetections([(next(points), 20)])
+
+        with TemporaryDirectory() as folder:
+            path = Path(folder) / "input.mp4"
+            overlay = Path(folder) / "overlay.mp4"
+            with av.open(str(path), "w") as container:
+                stream = container.add_stream("libx264", rate=10)
+                stream.width, stream.height = 160, 64
+                stream.pix_fmt = "yuv420p"
+                stream.time_base = stream.codec_context.time_base = Fraction(1, 1000)
+                for pts in (40, 140, 440, 840, 1240):
+                    frame = av.VideoFrame.from_ndarray(np.zeros((64, 160, 3), np.uint8), "bgr24")
+                    frame.pts, frame.time_base = pts, stream.time_base
+                    container.mux(stream.encode(frame))
+                container.mux(stream.encode())
+
+            tracks = track_video(path, detector(), 0.75, 24, timestamp_source="pts")
+            self.assertEqual(
+                [o.timestamp_s for o in tracks[0].observations], [0, 0.1, 0.4, 0.8, 1.2]
+            )
+            events = detect_events(replace(scene, tracks=tracks))
+            (event,) = events
+            self.assertEqual(event.confirmed_s, 1.2)
+            self.assertEqual(
+                list(stream_video_events(path, detector(), scene, 24, timestamp_source="pts")),
+                events,
+            )
+            data = {
+                "timestamp_source": "pts",
+                "events": [asdict(event)],
+                "tracks": [track_record(track) for track in tracks],
+            }
+            render(path, scene, [("PTS", data)], overlay)
+            with timed_video(overlay, timestamp_source="pts", strict_length=True) as (_, frames):
+                self.assertEqual([time for time, _ in frames], [0, 0.1, 0.4, 0.8, 1.2])
+
     def test_strict_video_detects_a_truncated_capture(self):
         from traffic_trajectory.video import decoded_frames
 

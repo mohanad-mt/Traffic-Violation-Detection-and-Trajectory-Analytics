@@ -109,6 +109,56 @@ python -m benchmarks.assets build/assets tapnextpp-512
 PYTHONPATH=build/tapnet python -m benchmarks.road_validation.point_propagation build/assets/tapnextpp_512.ckpt build/road build/independent
 ```
 
+## External references and pipeline revisions
+
+I compared the 704 px RF-DETR-L checkpoint with Small and held ByteTrack, its 0.20 start and 0.03 continuation cutoffs, and the event scenes fixed. Large improved DAWN AP50–95 from 55.83 to 57.44 and small-object AP from 26.54 to 28.68. On the road clips the same configuration matched one event with Large and three with Small. Large had three extra alerts. Both used FP32 on the RTX 5090. [Run record](runs/research-revision.json)
+
+| Development run | TP | FP | FN | F1 |
+| --- | ---: | ---: | ---: | ---: |
+| RF-DETR-S, ByteTrack, existing rules | 3 | 1 | 1 | 0.75 |
+| RF-DETR-L, ByteTrack, existing rules | 1 | 3 | 3 | 0.25 |
+| RF-DETR-S, ByteTrack, 0.75 px/s stop drift bound | 3 | 0 | 1 | 0.86 |
+
+The stop check limits net displacement divided by elapsed time when an alert is about to confirm. At the existing 4 px anchor radius, 0.60, 0.75, and 0.90 px/s each removed the early stop alert on this clip. The matched stop kept its 4.67 s estimated onset and 7.73 s confirmation. Batch and streaming emitted that same event from the video. The result is a one-camera development trial. A separate direction prototype used the latest point and a point roughly 0.25, 0.40 or 0.60 s earlier to reduce per-frame jitter. It recovered no extra match and added false alerts, so the application uses the original direction rule.
+
+On the two nighttime transfer clips, Large with the fixed ByteTrack setting missed both events and added one false alert. Lowering the start cutoff to 0.10 after looking at the misses recovered Camera 1 for each model and added three false alerts per model across both clips. This is an exploratory threshold check on previously examined footage.
+
+### FETV footage and clock accuracy
+
+The official download contained 200 clips from nine source prefixes. I inspected all video packet timestamps and checked the worst clip using decoded presentation timestamps. In 198 clips the packet timestamp intervals varied. The maximum absolute difference between the frame-index clock and the packet clock exceeded 100 ms on 20 clips and reached 142 ms on one. The median of the per-clip maxima was 66 ms. Timing differences of this size can move a crossing across a signal transition.
+
+Both the batch and streaming paths accept `--timestamp-source pts`. The renderer uses the same clock when the prediction JSON identifies that mode. A generated variable-rate test verifies frame timing through tracking, alert confirmation and MP4 export. The stop-clip overlay preserved all 158 timestamps to within one microsecond. The FETV archive contains no ground-truth JSON, so these are timing and access results. [Dataset release](https://github.com/MoyoG/FETV) · [Missing annotation issue](https://github.com/MoyoG/FETV/issues/1)
+
+### Reproduce these revisions
+
+```sh
+python -m benchmarks.assets build/assets dawn-fog rfdetr-small rfdetr-large fetv-clips
+python -m zipfile -e build/assets/FETV_public_clips.zip build/fetv
+python -m benchmarks.video_clock build/fetv/FETV_public_clips
+python -m benchmarks.compare_detectors dawn-rfdetr-large build/assets/DAWN-Fog.zip build/assets/rf-detr-large-2026.pth --dataset dawn-fog --device cuda --detector rfdetr-large
+python -m benchmarks.road_validation.compare build/assets/rf-detr-large-2026.pth build/road build/nighttime/sample.avi --device cuda --detector rfdetr-large --tracker bytetrack
+python -m benchmarks.road_validation.compare build/assets/rf-detr-small.pth build/road build/nighttime/sample.avi --device cuda --detector rfdetr --tracker bytetrack --max-stopped-drift-px-s .75
+```
+
+For the stop-clip confirmation check, set `max_stopped_drift_px_s` to 0.75 in a copy of its scene. Run the main video CLI with RF-DETR-S, ByteTrack and the same cutoffs. Use `--timestamp-source pts --include-tracks` for batch output and `--timestamp-source pts --stream-events` for incremental output. Pass the batch JSON to `traffic_trajectory.visualize` to render the PTS overlay.
+
+### Continuous stopped-vehicle check
+
+I retrieved video 2 and the training timestamps from the official AI City 2021 Track 4 archive. The release labels a stop onset at 587 s. I drew two roadway polygons on an earlier frame at 30 s and ran RF-DETR-S and ByteTrack at 5 FPS through the full 894 s video. Each rule setting used the same tracks. The score matches one onset within 10 s and counts other alerts as unmatched. This is a time-only diagnostic on one public training video, because the official label supplies neither a vehicle ID nor a lane. [Download](https://www.aicitychallenge.org/2021-track4-download/) · [Label and evaluation format](https://www.aicitychallenge.org/2021-data-and-evaluation/)
+
+| Stop duration | Drift limit | Unmatched alerts | Time matches | Delay from labeled onset |
+| --- | --- | ---: | ---: | ---: |
+| 3 s | Off | 749 | 1 | 2.4 s |
+| 3 s | 0.75 px/s | 585 | 1 | 2.4 s |
+| 10 s | Off or 0.75 px/s | 38 | 1 | 14.4 s |
+| 20 s | Off or 0.75 px/s | 6 | 0 | — |
+
+At 3 s with the drift bound, 401 of 585 unmatched alerts began within the top 50 px, near the highway horizon. The time match came from a 7 × 6 px box in that region. The 10 s match came from a different track lower in the frame. The time matches alone cannot establish that either setting followed the incident vehicle. The clip shows that fixed pixel thresholds and short dwell can generate many candidates even with a drift limit. The latency and missed match at longer durations argue for camera-aware motion or other stop evidence before choosing a new global setting. [Run record](runs/research-revision.json)
+
+```sh
+python -m benchmarks.road_validation.aicity21_stop build/aicity21-track4-train-data/2.mp4 build/assets/rf-detr-small.pth --device cuda
+```
+
 ## Reproduce
 
 Install the optional packages described in the [README](../README.md#detectors-and-trackers). Obtain the pinned weights and evaluation inputs.

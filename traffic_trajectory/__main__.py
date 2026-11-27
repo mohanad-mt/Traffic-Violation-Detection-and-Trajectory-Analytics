@@ -12,7 +12,13 @@ from .scenario import parse_scenario, track_record
 def main() -> None:
     parser = argparse.ArgumentParser(description="Detect candidate events from tracks or video.")
     parser.add_argument("scenario", help="Path to a scenario JSON file, or - to read from stdin")
-    parser.add_argument("--video", type=Path, help="Constant-frame-rate video file")
+    parser.add_argument("--video", type=Path, help="Video file")
+    parser.add_argument(
+        "--timestamp-source",
+        choices=("fps", "pts"),
+        default="fps",
+        help="Use frame index and FPS, or decoded presentation timestamps",
+    )
     parser.add_argument(
         "--strict-video", action="store_true", help="Check the declared frame count"
     )
@@ -24,7 +30,9 @@ def main() -> None:
     detector_args.add_argument(
         "--model", type=Path, help="Local model weights or checkpoint directory"
     )
-    parser.add_argument("--detector", choices=("yolox", "rtdetr", "rfdetr"), default="yolox")
+    parser.add_argument(
+        "--detector", choices=("yolox", "rtdetr", "rfdetr", "rfdetr-large"), default="yolox"
+    )
     parser.add_argument(
         "--device", choices=("cpu", "cuda"), default="cpu", help="Neural inference device"
     )
@@ -71,6 +79,8 @@ def main() -> None:
         help="Project tracks using the scene's ground_plane calibration",
     )
     args = parser.parse_args()
+    if args.video is None and args.timestamp_source != "fps":
+        parser.error("--timestamp-source pts requires --video")
     if args.video is None and (args.strict_video or args.stream_events):
         parser.error("--strict-video and --stream-events require --video")
     if args.stream_events and (args.include_tracks or args.include_ground_tracks):
@@ -152,6 +162,7 @@ def main() -> None:
                         tracker_name=args.tracker,
                         confidence=args.confidence,
                         strict_length=args.strict_video,
+                        timestamp_source=args.timestamp_source,
                     ):
                         print(json.dumps(asdict(event)), flush=True)
                     return
@@ -163,6 +174,7 @@ def main() -> None:
                     tracker_name=args.tracker,
                     confidence=args.confidence,
                     strict_length=args.strict_video,
+                    timestamp_source=args.timestamp_source,
                 )
             except cv2.error as error:
                 raise ValueError(f"OpenCV could not process the input: {error}") from error
@@ -171,6 +183,8 @@ def main() -> None:
         parser.error(str(error))
 
     output = {"events": [asdict(event) for event in detect_events(scenario)]}
+    if args.timestamp_source == "pts":
+        output["timestamp_source"] = "pts"
     if args.include_tracks:
         output["tracks"] = [track_record(track) for track in scenario.tracks]
     if args.include_ground_tracks:

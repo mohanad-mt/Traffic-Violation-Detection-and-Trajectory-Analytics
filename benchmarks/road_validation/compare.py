@@ -94,8 +94,13 @@ def replay(
     tracker_name: str,
     cutoff: float,
     weak_cutoff: float,
+    *,
+    max_stopped_drift_px_s: float | None = None,
 ) -> dict:
-    scene = parse_scenario({**read_json(case.scene), "tracks": []})
+    payload = {**read_json(case.scene), "tracks": []}
+    if max_stopped_drift_px_s is not None:
+        payload.setdefault("thresholds", {})["max_stopped_drift_px_s"] = max_stopped_drift_px_s
+    scene = parse_scenario(payload)
     labels = read_json(case.labels)
     if case.name == "fog":
         labels["events"][0]["trajectory"] = read_json(DATA / "fog.manual-trace.json")["tracks"][0][
@@ -126,6 +131,7 @@ def replay(
         "tracker": tracker_name,
         "track_start": cutoff,
         "continuation": weak_cutoff,
+        "max_stopped_drift_px_s": scene.thresholds.max_stopped_drift_px_s,
         "track_ids": len(tracks),
         "observations": sum(len(track.observations) for track in tracks),
         "replay_ms_per_frame": replay_ms / len(detections),
@@ -146,6 +152,7 @@ def main() -> None:
         "--tracker", choices=("point", "bytetrack", "ocsort"), nargs="+", default=["point"]
     )
     parser.add_argument("--cache-dir", type=Path)
+    parser.add_argument("--max-stopped-drift-px-s", type=float)
     args = parser.parse_args()
     cv2.setNumThreads(4)
     detector = make_detector(
@@ -173,7 +180,15 @@ def main() -> None:
             "fps": fps,
             "mean_detector_ms": mean(ms),
             "runs": [
-                replay(case, fps, boxes, tracker, cutoff, weak)
+                replay(
+                    case,
+                    fps,
+                    boxes,
+                    tracker,
+                    cutoff,
+                    weak,
+                    max_stopped_drift_px_s=args.max_stopped_drift_px_s,
+                )
                 for tracker in args.tracker
                 for cutoff in TRACK_START
                 for weak in (cutoff, CONTINUATION)

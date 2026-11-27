@@ -15,6 +15,17 @@ ASSETS = {
         "https://repo.roboflow.com/rfdetr/small_coco/checkpoint_best_regular.pth",
         "d81979a9213a2109345158ce9232668df4c1ae52e9b8db3f2ec0a8cbad959b33",
     ),
+    "rfdetr-large": (
+        "rf-detr-large-2026.pth",
+        "https://repo.roboflow.com/rfdetr/rf-detr-large-2026.pth",
+        "0f4e20e19a99c0f8a62b5685f57f6c8b5c371c59081feda6752a0561a79ccf38",
+    ),
+    "fetv-clips": (
+        "FETV_public_clips.zip",
+        "https://drive.usercontent.google.com/download"
+        "?id=176SSZptsLbuWX_lDLzfQq7anXdrQdca9&export=download&confirm=t",
+        "b57feb554189596be267d0355af7a9a7aca9f5949d82747d1b396cee39793fd4",
+    ),
     "tapnextpp-512": (
         "tapnextpp_512.ckpt",
         "https://storage.googleapis.com/gresearch/tapnextpp/tapnextpp_512.ckpt",

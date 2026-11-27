@@ -23,11 +23,12 @@ The demo matches all three [labels](examples/video.labels.json) within 0.5 secon
 
 ## Detectors and trackers
 
-Use a constant-frame-rate clip and a [scene JSON](examples/video.scene.json) with lane coordinates in video pixels. Include signal timing to enable the red-light rule.
+Use a local video and a [scene JSON](examples/video.scene.json) with lane coordinates in video pixels. Include signal timing relative to the first decoded frame to enable the red-light rule.
 
 - `--model` takes a local YOLOX ONNX file. The default RGB preprocessing works with the full-precision OpenCV Zoo YOLOX-S export. Use `--yolox-input-color bgr` for the upstream YOLOX-M export. [Zoo checkpoint](https://huggingface.co/opencv/opencv_zoo/tree/main/models/object_detection_yolox) · [Upstream weights](https://github.com/Megvii-BaseDetection/YOLOX/blob/main/demo/ONNXRuntime/README.md)
 - `--detector rtdetr --model build/assets/rtdetr-r18` uses a local RT-DETR checkpoint. Fetch the pinned files with `python -m benchmarks.assets build/assets rtdetr-config rtdetr-processor rtdetr-weights`.
 - `--detector rfdetr --model build/assets/rf-detr-small.pth` uses RF-DETR-S. Fetch it with `python -m benchmarks.assets build/assets rfdetr-small`. [Comparison on fog images and road clips](benchmarks/UPGRADE.md#rf-detr-small)
+- `--detector rfdetr-large --model build/assets/rf-detr-large-2026.pth` uses the 704 px RF-DETR-L checkpoint. Fetch it with `python -m benchmarks.assets build/assets rfdetr-large`. [Small vs. Large benchmark](benchmarks/UPGRADE.md#external-references-and-pipeline-revisions)
 - `--background empty-road.png` compares each frame against an empty-road image from the same camera and resolution. Shadows, lighting changes, and other objects can show up as foreground detections.
 
 ```sh
@@ -67,6 +68,8 @@ The detector and tracker settings above recovered the development fog alert. Che
 ### Incremental output and video overlays
 
 Add `--stream-events` to flush each confirmed event as a JSON line while decoding a local video. Track and rule state expire as the video advances. The online stop rule can suppress a nearby confirmed stop after a track expires. Offline scoring can also examine short intervening fragments. Use `--strict-video` to check a clip against its declared frame count when that metadata is trustworthy.
+
+Use `--timestamp-source pts` for variable-frame-rate clips and when small timing errors affect signal transitions. PyAV decodes presentation timestamps, and the pipeline measures time from the first decoded frame. For `--include-tracks` output, the overlay renderer reads the timestamp mode from the JSON and preserves frame spacing in the exported MP4. Use the same timestamp mode on both sides of a comparison overlay.
 
 Render a saved `--include-tracks` result with the lane, legal direction, stop line, track IDs, boxes, scores and alerts. The optional comparison uses the same underlying clip.
 
@@ -126,6 +129,7 @@ Set overrides in `thresholds`. Mark expected queue or parking regions in `stop_e
 | `max_pause_s` | 0.25 | Time a reverse episode can tolerate subthreshold steps |
 | `stopped_duration_s` | 3.0 | Minimum time within the stopped radius |
 | `stopped_radius_px` | 4 | Maximum distance from the stop anchor |
+| `max_stopped_drift_px_s` | 0 | Optional bound on net displacement divided by elapsed time at stop confirmation. Set to 0 to disable. Tune with the target camera's scale and stop examples. |
 | `stopped_realert_gap_s` | 2.0 | Longest gap for treating nearby stationary fragments as a reported stop. Set to 0 to disable. |
 | `red_line_margin_px` | 2 | Minimum perpendicular distance to arm and confirm a crossing |
 
