@@ -159,6 +159,34 @@ At 3 s with the drift bound, 401 of 585 unmatched alerts began within the top 50
 python -m benchmarks.road_validation.aicity21_stop build/aicity21-track4-train-data/2.mp4 build/assets/rf-detr-small.pth --device cuda
 ```
 
+### Published stall detector comparison
+
+Zhao et al. took first place on AI City 2021 Track 4 with 0.9524 F1, 5.3080 s onset RMSE and a 0.9355 composite score. Track 4 covers timed stalls and crashes on fixed cameras. The official code index marks the top three entries private. Team 76's public pointer has no runnable source or weights, and the third-place public repository omits the anomaly detection stages described in its README. The 2020 winner publishes its stages and training recipes, which require a separately trained detector and a legacy Paddle stack. [2021 paper](https://openaccess.thecvf.com/content/CVPR2021W/AICity/papers/Zhao_Good_Practices_and_a_Strong_Baseline_for_Traffic_Anomaly_Detection_CVPRW_2021_paper.pdf) · [Code index](https://github.com/NVIDIAAICITYCHALLENGE/2021AICITY_Code_From_Top_Teams) · [Team 76 pointer](https://github.com/Endeavour10020/AiCity-2021-Track4) · [Team 92 release](https://github.com/jingyuanchan/CVPR_AICity_2021_Anomaly_Detection) · [2020 winner](https://github.com/Cury30/AICity2020-Anomaly-Detection)
+
+The replay implements the winner's core stall-detection idea. It runs a MOG2 background model in each direction at 5 Hz, detects vehicles in each background at about 1 Hz, and groups reverse-pass boxes by overlap with a fixed anchor. A candidate needs 30 s of persistence, at least 60% detection support and an overlapping forward-pass detection. An appearance check looks back up to 30 s in the original frames, using the paper's 20 dB PSNR threshold, and spatial deduplication keeps the longer tube. The 4 s background history and variance threshold of 16 come from the released 2020 code. This implementation uses the project's RF-DETR-S checkpoint and fixed road polygons. The published system used a trained detector ensemble, automatic road masks, camera stabilization, pixel-state matrices, SSIM tube filtering and collision-onset refinement.
+
+Run both detectors on the original training clips. Video 2 has one labeled incident at 587 s. Video 1 is a congestion control with no incident in the release's annotation file. Both methods use the same per-clip road polygons, PTS clock, RF-DETR-S checkpoint and one-to-one onset scoring within ±10 s. These are local, time-only scores on two training clips. Reverse modeling uses future frames, so the tube support timestamp cannot be used as live alert latency. The official test composite above is for the complete published system on the separate test set. [Download](https://www.aicitychallenge.org/2021-track4-download/) · [Label and evaluation format](https://www.aicitychallenge.org/2021-data-and-evaluation/)
+
+
+| Detector | Video 2 time matches | Video 2 unmatched alerts | Video 1 alerts |
+| --- | ---: | ---: | ---: |
+| RF-DETR-S + ByteTrack, 3 s default | 1 | 749 | 29 |
+| RF-DETR-S + ByteTrack, 3 s and 0.75 px/s drift limit | 1 | 585 | 19 |
+| RF-DETR-S + ByteTrack, 10 s | 1 | 38 | 0 |
+| RF-DETR-S + ByteTrack, 20 s | 0 | 6 | 0 |
+| Bidirectional background replay | 1 | 7 | 0 |
+
+The background replay estimated 591.2 s for the labeled 587 s incident. Its matched box overlaps a vehicle that is already stationary at 587 s and is still there at 820 s. The 3 s match came from a different position near the highway horizon. The 10 s rule matched the same image region as the background replay at 591.4 s. Manual spot checks of the two regions found the eight background alerts clustered around two stationary vehicles. Gaps and variation in box overlap can split one stationary vehicle into several tubes. The public labels supply one timestamp for the incident and give no vehicle identity, so the table counts all additional alerts as unmatched.
+
+Use the background replay as the offline stall baseline. Evaluate a past-only version with track-gap recovery on additional cameras before replacing the live stop rule. Measure confirmation delay and false alerts on congestion, and use vehicle-level labels to verify which stalled vehicle triggered each alert. [Run record](runs/aicity21-background.json)
+
+```sh
+python -m benchmarks.road_validation.aicity21_stop build/aicity21-track4-train-data/2.mp4 build/assets/rf-detr-small.pth --clip 2 --device cuda
+python -m benchmarks.road_validation.aicity21_background build/aicity21-track4-train-data/2.mp4 build/assets/rf-detr-small.pth --clip 2 --device cuda
+python -m benchmarks.road_validation.aicity21_stop build/aicity21-track4-train-data/1.mp4 build/assets/rf-detr-small.pth --clip 1 --device cuda
+python -m benchmarks.road_validation.aicity21_background build/aicity21-track4-train-data/1.mp4 build/assets/rf-detr-small.pth --clip 1 --device cuda
+```
+
 ## Reproduce
 
 Install the optional packages described in the [README](../README.md#detectors-and-trackers). Obtain the pinned weights and evaluation inputs.

@@ -1,9 +1,9 @@
-"""Replay a time-only stop comparison on AI City 2021 Track 4 training video 2."""
+"""Replay time-only stop comparisons on AI City 2021 Track 4 training clips."""
 
 import argparse
 import json
 from collections import Counter
-from dataclasses import asdict, replace
+from dataclasses import asdict, dataclass, replace
 from itertools import product
 from pathlib import Path
 
@@ -19,8 +19,8 @@ from traffic_trajectory.video import timed_video
 
 VIDEO_SHA256 = "c6451f72bc4e67132600f8ebc30f950de207a47a8ec65cde910f3bdff20f59e1"
 STRIDE = 6
-ONSET_S = 587
 TOLERANCE_S = 10
+EVENT_TYPE = "stopped_vehicle_candidate"
 SCENE = {
     "lanes": [
         {
@@ -38,11 +38,45 @@ SCENE = {
 }
 
 
-def run(video: Path, checkpoint: Path, device: str) -> dict:
-    if sha256(video) != VIDEO_SHA256:
-        raise ValueError("expected the original AI City 2021 Track 4 train-data 2.mp4")
+@dataclass(frozen=True)
+class StopClip:
+    checksum: str
+    onsets_s: tuple[int, ...]
+    scene: dict
+
+    def labels(self) -> dict:
+        return {
+            "events": [
+                {"type": EVENT_TYPE, "lane_id": "all", "start_s": onset} for onset in self.onsets_s
+            ]
+        }
+
+
+CLIPS = {
+    1: StopClip(
+        "92d2f1daa0dc44c0a997acc78f4ad08c4e8c2b03f930f6db9d3ff8ff9f85dcad",
+        (),
+        {
+            "lanes": [
+                {
+                    "id": "roadway",
+                    "polygon": [[0, 275], [669, 28], [756, 100], [620, 409], [0, 409]],
+                    "forward": [1, -0.5],
+                }
+            ],
+            "tracks": [],
+        },
+    ),
+    2: StopClip(VIDEO_SHA256, (587,), SCENE),
+}
+
+
+def run(video: Path, checkpoint: Path, device: str, clip_id: int = 2) -> dict:
+    clip = CLIPS[clip_id]
+    if sha256(video) != clip.checksum:
+        raise ValueError(f"expected the original AI City 2021 Track 4 train-data {clip_id}.mp4")
     cv2.setNumThreads(4)
-    scene = parse_scenario(SCENE)
+    scene = parse_scenario(clip.scene)
     detector = make_detector("rfdetr", checkpoint, 0.20, 0.03, device=device)
     sampled = 0
     with timed_video(video, timestamp_source="pts", strict_length=True) as (fps, frames):
@@ -57,19 +91,16 @@ def run(video: Path, checkpoint: Path, device: str) -> dict:
         track.id: {sample.timestamp_s: sample for sample in track.observations}
         for track in scene.tracks
     }
-    stop = {"type": "stopped_vehicle_candidate", "lane_id": "all", "start_s": ONSET_S}
     runs = {}
     for duration, drift in product((3.0, 10.0, 20.0), (0.0, 0.75)):
         thresholds = replace(
             scene.thresholds, stopped_duration_s=duration, max_stopped_drift_px_s=drift
         )
         configured = replace(scene, thresholds=thresholds)
-        events = [
-            asdict(event) for event in detect_events(configured) if event.type == stop["type"]
-        ]
+        events = [asdict(event) for event in detect_events(configured) if event.type == EVENT_TYPE]
         # The original annotation supplies onset time and has no roadway or track ID.
         predictions = {"events": [{**event, "lane_id": "all"} for event in events]}
-        report = evaluate(predictions, {"events": [stop]}, TOLERANCE_S, duration_s=duration_s)
+        report = evaluate(predictions, clip.labels(), TOLERANCE_S, duration_s=duration_s)
         anchors = [observations[e["track_id"]][e["start_s"]] for e in events]
         matched = {match["prediction_index"] for match in report["matches"]}
         y_bins = Counter(
@@ -90,10 +121,11 @@ def run(video: Path, checkpoint: Path, device: str) -> dict:
             "unmatched_by_anchor_y_bin_px": dict(sorted(y_bins.items())),
         }
     return {
-        "video_sha256": VIDEO_SHA256,
+        "clip_id": clip_id,
+        "video_sha256": clip.checksum,
         "checkpoint_sha256": sha256(checkpoint),
-        "scene": SCENE,
-        "label_onset_s": ONSET_S,
+        "scene": clip.scene,
+        "label_onsets_s": clip.onsets_s,
         "onset_tolerance_s": TOLERANCE_S,
         "sampled_fps": fps / STRIDE,
         "sampled_frames": sampled,
@@ -108,9 +140,10 @@ def main() -> None:
     parser.add_argument("video", type=Path)
     parser.add_argument("checkpoint", type=Path)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
+    parser.add_argument("--clip", type=int, choices=CLIPS, default=2)
     args = parser.parse_args()
     try:
-        print(json.dumps(run(args.video, args.checkpoint, args.device), indent=2))
+        print(json.dumps(run(args.video, args.checkpoint, args.device, args.clip), indent=2))
     except (OSError, ValueError) as error:
         parser.error(str(error))
 

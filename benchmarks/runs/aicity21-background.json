@@ -1,0 +1,754 @@
+{
+  "dataset": "AI City 2021 Track 4 public training videos",
+  "label_file_sha256": "b542d8eff0b7786bd38d2d50615f1587546ab97f201ea1916180576c8afaf104",
+  "scoring": "One-to-one time-only matching with a 10-second onset tolerance",
+  "environment": {
+    "os": "Windows",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "python": "3.13.5",
+    "rfdetr": "1.12.1",
+    "torch": "2.10.0+cu130",
+    "supervision": "0.32.3",
+    "opencv": "4.13.0.92",
+    "numpy": "2.4.3",
+    "pyav": "19.0.2"
+  },
+  "raw_frame_tracking": {
+    "1": {
+      "clip_id": 1,
+      "video_sha256": "92d2f1daa0dc44c0a997acc78f4ad08c4e8c2b03f930f6db9d3ff8ff9f85dcad",
+      "checkpoint_sha256": "d81979a9213a2109345158ce9232668df4c1ae52e9b8db3f2ec0a8cbad959b33",
+      "scene": {
+        "lanes": [
+          {
+            "id": "roadway",
+            "polygon": [
+              [
+                0,
+                275
+              ],
+              [
+                669,
+                28
+              ],
+              [
+                756,
+                100
+              ],
+              [
+                620,
+                409
+              ],
+              [
+                0,
+                409
+              ]
+            ],
+            "forward": [
+              1,
+              -0.5
+            ]
+          }
+        ],
+        "tracks": []
+      },
+      "label_onsets_s": [],
+      "onset_tolerance_s": 10,
+      "sampled_fps": 5.0,
+      "sampled_frames": 4471,
+      "duration_s": 894.0333333333333,
+      "settings_key": "stopped_duration_s:max_stopped_drift_px_s",
+      "runs": {
+        "3:0": {
+          "overall": {
+            "true_positives": 0,
+            "false_positives": 29,
+            "false_negatives": 0,
+            "precision": 0.0,
+            "recall": null,
+            "f1": 0.0,
+            "mean_confirmation_delay_s": null,
+            "mean_abs_onset_error_s": null,
+            "duplicate_alerts": 0,
+            "duplicate_alert_rate": 0.0,
+            "false_alarms_per_hour": 116.77416949405317
+          },
+          "matched_onsets": [],
+          "unmatched_by_anchor_y_bin_px": {
+            "50": 3,
+            "150": 21,
+            "200": 5
+          }
+        },
+        "3:0.75": {
+          "overall": {
+            "true_positives": 0,
+            "false_positives": 19,
+            "false_negatives": 0,
+            "precision": 0.0,
+            "recall": null,
+            "f1": 0.0,
+            "mean_confirmation_delay_s": null,
+            "mean_abs_onset_error_s": null,
+            "duplicate_alerts": 0,
+            "duplicate_alert_rate": 0.0,
+            "false_alarms_per_hour": 76.5072144961038
+          },
+          "matched_onsets": [],
+          "unmatched_by_anchor_y_bin_px": {
+            "50": 2,
+            "150": 12,
+            "200": 5
+          }
+        },
+        "10:0": {
+          "overall": {
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "mean_confirmation_delay_s": null,
+            "mean_abs_onset_error_s": null,
+            "duplicate_alerts": 0,
+            "duplicate_alert_rate": null,
+            "false_alarms_per_hour": 0.0
+          },
+          "matched_onsets": [],
+          "unmatched_by_anchor_y_bin_px": {}
+        },
+        "10:0.75": {
+          "overall": {
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "mean_confirmation_delay_s": null,
+            "mean_abs_onset_error_s": null,
+            "duplicate_alerts": 0,
+            "duplicate_alert_rate": null,
+            "false_alarms_per_hour": 0.0
+          },
+          "matched_onsets": [],
+          "unmatched_by_anchor_y_bin_px": {}
+        },
+        "20:0": {
+          "overall": {
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "mean_confirmation_delay_s": null,
+            "mean_abs_onset_error_s": null,
+            "duplicate_alerts": 0,
+            "duplicate_alert_rate": null,
+            "false_alarms_per_hour": 0.0
+          },
+          "matched_onsets": [],
+          "unmatched_by_anchor_y_bin_px": {}
+        },
+        "20:0.75": {
+          "overall": {
+            "true_positives": 0,
+            "false_positives": 0,
+            "false_negatives": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "mean_confirmation_delay_s": null,
+            "mean_abs_onset_error_s": null,
+            "duplicate_alerts": 0,
+            "duplicate_alert_rate": null,
+            "false_alarms_per_hour": 0.0
+          },
+          "matched_onsets": [],
+          "unmatched_by_anchor_y_bin_px": {}
+        }
+      }
+    },
+    "2": {
+      "video_sha256": "c6451f72bc4e67132600f8ebc30f950de207a47a8ec65cde910f3bdff20f59e1",
+      "checkpoint_sha256": "d81979a9213a2109345158ce9232668df4c1ae52e9b8db3f2ec0a8cbad959b33",
+      "scene": {
+        "lanes": [
+          {
+            "id": "far-roadway",
+            "polygon": [
+              [
+                0,
+                176
+              ],
+              [
+                765,
+                28
+              ],
+              [
+                768,
+                45
+              ],
+              [
+                0,
+                303
+              ]
+            ],
+            "forward": [
+              -1,
+              0.3
+            ]
+          },
+          {
+            "id": "near-roadway",
+            "polygon": [
+              [
+                0,
+                310
+              ],
+              [
+                775,
+                38
+              ],
+              [
+                795,
+                37
+              ],
+              [
+                371,
+                409
+              ],
+              [
+                0,
+                409
+              ]
+            ],
+            "forward": [
+              1,
+              -0.5
+            ]
+          }
+        ],
+        "tracks": []
+      },
+      "onset_tolerance_s": 10,
+      "sampled_fps": 5.0,
+      "sampled_frames": 4470,
+      "duration_s": 894.0,
+      "settings_key": "stopped_duration_s:max_stopped_drift_px_s",
+      "runs": {
+        "3:0": {
+          "overall": {
+            "true_positives": 1,
+            "false_positives": 749,
+            "false_negatives": 0,
+            "precision": 0.0013333333333333333,
+            "recall": 1.0,
+            "f1": 0.002663115845539281,
+            "mean_confirmation_delay_s": 2.3999999999999773,
+            "mean_abs_onset_error_s": 0.6000000000000227,
+            "duplicate_alerts": 10,
+            "duplicate_alert_rate": 0.013333333333333334,
+            "false_alarms_per_hour": 3016.1073825503354
+          },
+          "matched_onsets": [
+            {
+              "track_id": "vehicle-4215",
+              "lane_id": "near-roadway",
+              "start_s": 586.4,
+              "confirmed_s": 589.4,
+              "type": "stopped_vehicle_candidate",
+              "position": [
+                786.6202392578125,
+                39.24626541137695
+              ],
+              "box": {
+                "x": 782.964599609375,
+                "y": 33.21047592163086,
+                "width": 7.311279296875,
+                "height": 6.035789489746094,
+                "score": 0.056248366832733154,
+                "category": "truck"
+              }
+            }
+          ],
+          "unmatched_by_anchor_y_bin_px": {
+            "0": 531,
+            "50": 134,
+            "100": 84
+          }
+        },
+        "3:0.75": {
+          "overall": {
+            "true_positives": 1,
+            "false_positives": 585,
+            "false_negatives": 0,
+            "precision": 0.0017064846416382253,
+            "recall": 1.0,
+            "f1": 0.0034071550255536627,
+            "mean_confirmation_delay_s": 2.3999999999999773,
+            "mean_abs_onset_error_s": 0.6000000000000227,
+            "duplicate_alerts": 6,
+            "duplicate_alert_rate": 0.010238907849829351,
+            "false_alarms_per_hour": 2355.7046979865772
+          },
+          "matched_onsets": [
+            {
+              "track_id": "vehicle-4215",
+              "lane_id": "near-roadway",
+              "start_s": 586.4,
+              "confirmed_s": 589.4,
+              "type": "stopped_vehicle_candidate",
+              "position": [
+                786.6202392578125,
+                39.24626541137695
+              ],
+              "box": {
+                "x": 782.964599609375,
+                "y": 33.21047592163086,
+                "width": 7.311279296875,
+                "height": 6.035789489746094,
+                "score": 0.056248366832733154,
+                "category": "truck"
+              }
+            }
+          ],
+          "unmatched_by_anchor_y_bin_px": {
+            "0": 401,
+            "50": 100,
+            "100": 84
+          }
+        },
+        "10:0": {
+          "overall": {
+            "true_positives": 1,
+            "false_positives": 38,
+            "false_negatives": 0,
+            "precision": 0.02564102564102564,
+            "recall": 1.0,
+            "f1": 0.05,
+            "mean_confirmation_delay_s": 14.399999999999977,
+            "mean_abs_onset_error_s": 4.399999999999977,
+            "duplicate_alerts": 1,
+            "duplicate_alert_rate": 0.02564102564102564,
+            "false_alarms_per_hour": 153.0201342281879
+          },
+          "matched_onsets": [
+            {
+              "track_id": "vehicle-4677",
+              "lane_id": "near-roadway",
+              "start_s": 591.4,
+              "confirmed_s": 601.4,
+              "type": "stopped_vehicle_candidate",
+              "position": [
+                594.197265625,
+                108.03874206542969
+              ],
+              "box": {
+                "x": 584.659423828125,
+                "y": 94.15283203125,
+                "width": 19.07568359375,
+                "height": 13.885910034179688,
+                "score": 0.10486717522144318,
+                "category": "truck"
+              }
+            }
+          ],
+          "unmatched_by_anchor_y_bin_px": {
+            "50": 11,
+            "100": 27
+          }
+        },
+        "10:0.75": {
+          "overall": {
+            "true_positives": 1,
+            "false_positives": 38,
+            "false_negatives": 0,
+            "precision": 0.02564102564102564,
+            "recall": 1.0,
+            "f1": 0.05,
+            "mean_confirmation_delay_s": 14.399999999999977,
+            "mean_abs_onset_error_s": 4.399999999999977,
+            "duplicate_alerts": 1,
+            "duplicate_alert_rate": 0.02564102564102564,
+            "false_alarms_per_hour": 153.0201342281879
+          },
+          "matched_onsets": [
+            {
+              "track_id": "vehicle-4677",
+              "lane_id": "near-roadway",
+              "start_s": 591.4,
+              "confirmed_s": 601.4,
+              "type": "stopped_vehicle_candidate",
+              "position": [
+                594.197265625,
+                108.03874206542969
+              ],
+              "box": {
+                "x": 584.659423828125,
+                "y": 94.15283203125,
+                "width": 19.07568359375,
+                "height": 13.885910034179688,
+                "score": 0.10486717522144318,
+                "category": "truck"
+              }
+            }
+          ],
+          "unmatched_by_anchor_y_bin_px": {
+            "50": 11,
+            "100": 27
+          }
+        },
+        "20:0": {
+          "overall": {
+            "true_positives": 0,
+            "false_positives": 6,
+            "false_negatives": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "mean_confirmation_delay_s": null,
+            "mean_abs_onset_error_s": null,
+            "duplicate_alerts": 0,
+            "duplicate_alert_rate": 0.0,
+            "false_alarms_per_hour": 24.161073825503355
+          },
+          "matched_onsets": [],
+          "unmatched_by_anchor_y_bin_px": {
+            "100": 6
+          }
+        },
+        "20:0.75": {
+          "overall": {
+            "true_positives": 0,
+            "false_positives": 6,
+            "false_negatives": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "mean_confirmation_delay_s": null,
+            "mean_abs_onset_error_s": null,
+            "duplicate_alerts": 0,
+            "duplicate_alert_rate": 0.0,
+            "false_alarms_per_hour": 24.161073825503355
+          },
+          "matched_onsets": [],
+          "unmatched_by_anchor_y_bin_px": {
+            "100": 6
+          }
+        }
+      },
+      "clip_id": 2,
+      "label_onsets_s": [
+        587
+      ]
+    }
+  },
+  "background_replay": {
+    "1": {
+      "method": "Team76-inspired offline stop detector",
+      "clip_id": 1,
+      "video_sha256": "92d2f1daa0dc44c0a997acc78f4ad08c4e8c2b03f930f6db9d3ff8ff9f85dcad",
+      "checkpoint_sha256": "d81979a9213a2109345158ce9232668df4c1ae52e9b8db3f2ec0a8cbad959b33",
+      "device": "cuda",
+      "duration_s": 894.0333333333333,
+      "background_fps": 5.0,
+      "detection_fps": 1.0,
+      "background_history_frames": 20,
+      "background_variance": 16,
+      "detector_confidence": 0.2,
+      "tube_iou": 0.5,
+      "tube_max_gap_s": 3.0,
+      "tube_min_duration_s": 30.0,
+      "tube_min_support": 0.6,
+      "appearance_traceback_s": 30.0,
+      "appearance_psnr_db": 20.0,
+      "scene": {
+        "lanes": [
+          {
+            "id": "roadway",
+            "polygon": [
+              [
+                0,
+                275
+              ],
+              [
+                669,
+                28
+              ],
+              [
+                756,
+                100
+              ],
+              [
+                620,
+                409
+              ],
+              [
+                0,
+                409
+              ]
+            ],
+            "forward": [
+              1,
+              -0.5
+            ]
+          }
+        ],
+        "tracks": []
+      },
+      "label_onsets_s": [],
+      "onset_tolerance_s": 10,
+      "elapsed_s": 128.8413582999783,
+      "candidates_before_deduplication": 0,
+      "events": [],
+      "overall": {
+        "true_positives": 0,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "mean_abs_onset_error_s": null,
+        "duplicate_alerts": 0,
+        "duplicate_alert_rate": null,
+        "false_alarms_per_hour": 0.0
+      },
+      "matches": []
+    },
+    "2": {
+      "method": "Team76-inspired offline stop detector",
+      "clip_id": 2,
+      "video_sha256": "c6451f72bc4e67132600f8ebc30f950de207a47a8ec65cde910f3bdff20f59e1",
+      "checkpoint_sha256": "d81979a9213a2109345158ce9232668df4c1ae52e9b8db3f2ec0a8cbad959b33",
+      "device": "cuda",
+      "duration_s": 894.0,
+      "background_fps": 5.0,
+      "detection_fps": 1.0,
+      "background_history_frames": 20,
+      "background_variance": 16,
+      "detector_confidence": 0.2,
+      "tube_iou": 0.5,
+      "tube_max_gap_s": 3.0,
+      "tube_min_duration_s": 30.0,
+      "tube_min_support": 0.6,
+      "appearance_traceback_s": 30.0,
+      "appearance_psnr_db": 20.0,
+      "scene": {
+        "lanes": [
+          {
+            "id": "far-roadway",
+            "polygon": [
+              [
+                0,
+                176
+              ],
+              [
+                765,
+                28
+              ],
+              [
+                768,
+                45
+              ],
+              [
+                0,
+                303
+              ]
+            ],
+            "forward": [
+              -1,
+              0.3
+            ]
+          },
+          {
+            "id": "near-roadway",
+            "polygon": [
+              [
+                0,
+                310
+              ],
+              [
+                775,
+                38
+              ],
+              [
+                795,
+                37
+              ],
+              [
+                371,
+                409
+              ],
+              [
+                0,
+                409
+              ]
+            ],
+            "forward": [
+              1,
+              -0.5
+            ]
+          }
+        ],
+        "tracks": []
+      },
+      "label_onsets_s": [
+        587
+      ],
+      "onset_tolerance_s": 10,
+      "elapsed_s": 126.23511119998875,
+      "candidates_before_deduplication": 9,
+      "events": [
+        {
+          "type": "stopped_vehicle_candidate",
+          "lane_id": "all",
+          "start_s": 591.2,
+          "confirmed_s": 635.8,
+          "tube_start_s": 605.8,
+          "tube_end_s": 651.8,
+          "box": {
+            "x": 584.554931640625,
+            "y": 95.28660583496094,
+            "width": 19.14398193359375,
+            "height": 12.540260314941406,
+            "score": 0.7980955839157104,
+            "category": "car"
+          }
+        },
+        {
+          "type": "stopped_vehicle_candidate",
+          "lane_id": "all",
+          "start_s": 593.0,
+          "confirmed_s": 619.8,
+          "tube_start_s": 589.8,
+          "tube_end_s": 699.8,
+          "box": {
+            "x": 634.7649536132812,
+            "y": 78.8702621459961,
+            "width": 12.59661865234375,
+            "height": 8.873207092285156,
+            "score": 0.7400739789009094,
+            "category": "car"
+          }
+        },
+        {
+          "type": "stopped_vehicle_candidate",
+          "lane_id": "all",
+          "start_s": 650.8,
+          "confirmed_s": 680.8,
+          "tube_start_s": 650.8,
+          "tube_end_s": 686.8,
+          "box": {
+            "x": 581.9603271484375,
+            "y": 95.05583953857422,
+            "width": 21.69189453125,
+            "height": 12.822944641113281,
+            "score": 0.7552079558372498,
+            "category": "truck"
+          }
+        },
+        {
+          "type": "stopped_vehicle_candidate",
+          "lane_id": "all",
+          "start_s": 662.2,
+          "confirmed_s": 691.8,
+          "tube_start_s": 661.8,
+          "tube_end_s": 692.8,
+          "box": {
+            "x": 582.7944946289062,
+            "y": 94.78379821777344,
+            "width": 20.633544921875,
+            "height": 12.98382568359375,
+            "score": 0.7402800917625427,
+            "category": "truck"
+          }
+        },
+        {
+          "type": "stopped_vehicle_candidate",
+          "lane_id": "all",
+          "start_s": 667.8,
+          "confirmed_s": 727.8,
+          "tube_start_s": 697.8,
+          "tube_end_s": 734.8,
+          "box": {
+            "x": 634.65869140625,
+            "y": 78.85037994384766,
+            "width": 12.88299560546875,
+            "height": 8.955764770507812,
+            "score": 0.7186315059661865,
+            "category": "car"
+          }
+        },
+        {
+          "type": "stopped_vehicle_candidate",
+          "lane_id": "all",
+          "start_s": 681.8,
+          "confirmed_s": 741.8,
+          "tube_start_s": 711.8,
+          "tube_end_s": 808.8,
+          "box": {
+            "x": 585.2892456054688,
+            "y": 95.20561218261719,
+            "width": 18.5926513671875,
+            "height": 12.570228576660156,
+            "score": 0.8051248788833618,
+            "category": "car"
+          }
+        },
+        {
+          "type": "stopped_vehicle_candidate",
+          "lane_id": "all",
+          "start_s": 698.8,
+          "confirmed_s": 758.8,
+          "tube_start_s": 728.8,
+          "tube_end_s": 770.8,
+          "box": {
+            "x": 635.4663696289062,
+            "y": 79.17190551757812,
+            "width": 11.8905029296875,
+            "height": 8.328239440917969,
+            "score": 0.7441896796226501,
+            "category": "car"
+          }
+        },
+        {
+          "type": "stopped_vehicle_candidate",
+          "lane_id": "all",
+          "start_s": 792.8,
+          "confirmed_s": 852.8,
+          "tube_start_s": 822.8,
+          "tube_end_s": 889.8,
+          "box": {
+            "x": 585.2484130859375,
+            "y": 95.19178009033203,
+            "width": 18.56024169921875,
+            "height": 12.531356811523438,
+            "score": 0.7790289521217346,
+            "category": "car"
+          }
+        }
+      ],
+      "overall": {
+        "true_positives": 1,
+        "false_positives": 7,
+        "false_negatives": 0,
+        "precision": 0.125,
+        "recall": 1.0,
+        "f1": 0.2222222222222222,
+        "mean_abs_onset_error_s": 4.2000000000000455,
+        "duplicate_alerts": 1,
+        "duplicate_alert_rate": 0.125,
+        "false_alarms_per_hour": 28.187919463087248
+      },
+      "matches": [
+        {
+          "label_index": 0,
+          "prediction_index": 0
+        }
+      ]
+    }
+  }
+}
