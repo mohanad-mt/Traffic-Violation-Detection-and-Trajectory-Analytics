@@ -3,11 +3,13 @@
 import argparse
 import importlib
 import json
+import os
 import subprocess
 import sys
 from contextlib import redirect_stdout
 from dataclasses import asdict, replace
 from pathlib import Path
+from unittest.mock import patch
 
 import cv2
 
@@ -35,6 +37,48 @@ def _score(events: list[dict], labels: dict, tolerance: float, duration: float) 
         "events": events,
         "metrics": evaluate({"events": events}, labels, tolerance, duration_s=duration)["overall"],
     }
+
+
+def _score_team(
+    segments: list[list], category: str, labels: dict, tolerance: float, duration: float
+) -> dict:
+    (label,) = labels["events"]
+    events = [
+        {
+            "type": label["type"],
+            "lane_id": label["lane_id"],
+            "start_s": start,
+            "confirmed_s": start,
+            "end_s": end,
+        }
+        for start, end, kind in segments
+        if kind == category
+    ]
+    result = _score(events, labels, tolerance, duration)
+    # The batch API gives onset and end, with no alert emission timestamp.
+    del result["metrics"]["mean_confirmation_delay_s"]
+    for event in result["events"]:
+        del event["confirmed_s"]
+    return result
+
+
+def _team_red_segments(
+    team, video: str, config: dict, intervals: tuple[tuple[float, float], ...]
+) -> tuple[list[list], list[list]]:
+    shared_phase = []
+
+    class PhaseReplayAnalyzer(team.EventAnalyzer):
+        def events(self, duration: float) -> list[list]:
+            from_pixels = super().events(duration)
+            # Reuse the same tracks and replace only the signal state at each video timestamp.
+            for state in self.states:
+                state.red = any(start <= state.t_sec < end for start, end in intervals)
+            shared_phase.extend(super().events(duration))
+            return from_pixels
+
+    with patch.object(team, "EventAnalyzer", PhaseReplayAnalyzer):
+        from_pixels = team.analyze_video(video, config)
+    return from_pixels, shared_phase
 
 
 def run(checkout: Path, footage: Path, weights: Path, device: str) -> dict:
@@ -80,19 +124,13 @@ def run(checkout: Path, footage: Path, weights: Path, device: str) -> dict:
             x1, y1, x2, y2 = SIGNAL_CROP
             config["traffic_light_roi"] = [x1 / width, y1 / height, x2 / width, y2 / height]
             config["stop_line"] = normalize(document["stop_line"]["segment"])
+        intervals = scene.stop_line.red_intervals_s if scene.stop_line is not None else None
+        video_path = str(video.resolve())
         with redirect_stdout(sys.stderr):
-            segments = team.analyze_video(str(video.resolve()), config)
-        external = [
-            {
-                "type": label["type"],
-                "lane_id": label["lane_id"],
-                "start_s": start,
-                "confirmed_s": start,
-                "end_s": end,
-            }
-            for start, end, kind in segments
-            if kind == category
-        ]
+            if intervals is None:
+                segments = team.analyze_video(video_path, config)
+            else:
+                segments, shared_phase = _team_red_segments(team, video_path, config, intervals)
         tracks = track_video(
             video,
             detector,
@@ -107,20 +145,20 @@ def run(checkout: Path, footage: Path, weights: Path, device: str) -> dict:
             for event in detect_events(replace(scene, tracks=tracks))
             if event.type == label["type"]
         ]
-        team_metrics = _score(external, labels, tolerance, duration)
-        # The submitted batch API gives onset and end, with no alert emission timestamp.
-        del team_metrics["metrics"]["mean_confirmation_delay_s"]
-        for event in team_metrics["events"]:
-            del event["confirmed_s"]
         results[name] = {
             "video_sha256": sha256(video),
             "fps": fps,
             "duration_s": duration,
             "onset_tolerance_s": tolerance,
             "label": label,
-            "team404": team_metrics,
+            "team404": _score_team(segments, category, labels, tolerance, duration),
             "project": _score(project, labels, tolerance, duration),
         }
+        if intervals is not None:
+            results[name]["shared_red_intervals_s"] = intervals
+            results[name]["team404_shared_phase"] = _score_team(
+                shared_phase, category, labels, tolerance, duration
+            )
     return {
         "team404_revision": REVISION,
         "team404_yolo11n_sha256": WEIGHT_SHA,
@@ -138,12 +176,15 @@ def main() -> None:
     parser.add_argument("rfdetr_weights", type=Path)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
     args = parser.parse_args()
-    print(
-        json.dumps(
-            run(args.team404_checkout, args.road_folder, args.rfdetr_weights, args.device),
-            indent=2,
-        )
-    )
+    offline = {
+        "YOLO_OFFLINE": "true",
+        "YOLO_AUTOINSTALL": "false",
+        "HF_HUB_OFFLINE": "1",
+        "NO_ALBUMENTATIONS_UPDATE": "1",
+    }
+    with patch.dict(os.environ, offline):
+        result = run(args.team404_checkout, args.road_folder, args.rfdetr_weights, args.device)
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

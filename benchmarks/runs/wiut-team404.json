@@ -215,6 +215,34 @@
           "duplicate_alert_rate": 0.0,
           "false_alarms_per_hour": 0.0
         }
+      },
+      "shared_red_intervals_s": [
+        [
+          0.0,
+          3.3
+        ]
+      ],
+      "team404_shared_phase": {
+        "events": [
+          {
+            "type": "red_light_crossing_candidate",
+            "lane_id": "red",
+            "start_s": 0.6,
+            "end_s": 3.3
+          }
+        ],
+        "metrics": {
+          "true_positives": 0,
+          "false_positives": 1,
+          "false_negatives": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": 0.0,
+          "false_alarms_per_hour": 1090.909090909091
+        }
       }
     }
   },
