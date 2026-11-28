@@ -209,6 +209,29 @@ python -m pip install -r requirements-trackers.txt filterpy==1.4.5 lap==0.5.13 s
 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m benchmarks.road_validation.roadtrack build/upstream-roadtrack --per-camera 0 --jobs 8
 ```
 
+### Whole-system reference for the three event types
+
+The WIUT 2026 fixed-road-camera qualifier includes timed red-light running, wrong-way driving, and stopped vehicles. Team404 publishes code for all three. The organizer posts the overall hackathon winners, and I could not verify a public class-by-class qualifier ranking. BlockVision dropped wrong-way from its submitted class list. Its released predictions reproduce a 0.122 development score against its own labels with the organizer's evaluator. The AI City 2026 FETV winner, UniTraffic-Agent, scored 0.4848 on a composite for short fisheye clips that includes red-light and wrong-way classes. FETV has no stopped-vehicle class. [WIUT qualifier requirements](https://github.com/Pac1FF1zM/traffic_checker/blob/main/HACKATHON_REQUIREMENTS.md) · [WIUT results](https://hackathon.wiut.uz/results/) · [BlockVision results](https://github.com/SayyeedDeveloper/TXVU-Hackathon-BlockVision-team#results-on-the-sample-videos) · [FETV protocol](https://www.aicitychallenge.org/2026-track3/) · [AI City results](https://www.aicitychallenge.org/2026-challenge-winners/)
+
+I ran Team404's raw-video pipeline with its own YOLO11n, tracker, and event rules on the same four development clips as our RF-DETR-S and ByteTrack pipeline. Both received the established lane and stop-line geometry and processed every decoded frame. The external run used its visual signal classifier and a manually drawn signal crop. Our pipeline used the clip's labeled signal phase. Team404 read red in 17 of the 33 frames. The accident model was disabled for this comparison. [Team404 source](https://github.com/Pac1FF1zM/traffic_checker/tree/d12fe4ed33f48906b6dae1a086a56a97529561b3) · [Clips and labels](road_validation/README.md)
+
+| Clip | Reference onset | Team404 matches / extra alerts | Project matches / extra alerts |
+| --- | ---: | ---: | ---: |
+| Foggy wrong way | 2.0 s | 0 / 0 | 1 / 0 |
+| Shadowed wrong way | 3.0 s | 0 / 0 | 0 / 0 |
+| Highway stop | 5.0 s | 0 / 0 | 1 / 1 |
+| Red-light crossing | 1.8 s | 0 / 1 | 1 / 0 |
+
+The score checks only the target class per clip and matches onset within ±1 s for wrong way and stopped vehicles and ±0.5 s for red light. The labels and Team404 outputs in this check cannot establish vehicle identity. These four clips support a development comparison with a system that covers the same events. They cannot rank systems across new cameras. [Run record](runs/wiut-team404.json)
+
+```sh
+git clone https://github.com/Pac1FF1zM/traffic_checker.git build/upstream-wiut-team404
+git -C build/upstream-wiut-team404 checkout d12fe4ed33f48906b6dae1a086a56a97529561b3
+python build/upstream-wiut-team404/scripts/download_weights.py
+python -m pip install -r requirements-trackers.txt -r requirements-rfdetr.txt ultralytics==8.3.236
+python -m benchmarks.road_validation.wiut build/upstream-wiut-team404 build/road build/assets/rf-detr-small.pth --device cuda
+```
+
 ## Reproduce
 
 Install the optional packages described in the [README](../README.md#detectors-and-trackers). Obtain the pinned weights and evaluation inputs.
