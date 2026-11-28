@@ -1,0 +1,262 @@
+{
+  "team404_revision": "d12fe4ed33f48906b6dae1a086a56a97529561b3",
+  "team404_yolo11n_sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1",
+  "project_rfdetr_sha256": "d81979a9213a2109345158ce9232668df4c1ae52e9b8db3f2ec0a8cbad959b33",
+  "red_signal_crop_xyxy": [
+    331,
+    14,
+    345,
+    37
+  ],
+  "device": "cuda",
+  "cases": {
+    "wrong": {
+      "video_sha256": "1f563454a0b974445a3aadc06231a55fd88dd9e4727b3403fdef39773f440a39",
+      "fps": 7.5,
+      "duration_s": 8.0,
+      "onset_tolerance_s": 1.0,
+      "label": {
+        "type": "wrong_way_candidate",
+        "lane_id": "wrong",
+        "start_s": 2
+      },
+      "team404": {
+        "events": [],
+        "metrics": {
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 1,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": null,
+          "false_alarms_per_hour": 0.0
+        }
+      },
+      "project": {
+        "events": [
+          {
+            "track_id": "vehicle-7",
+            "lane_id": "wrong",
+            "start_s": 2.533333333333333,
+            "confirmed_s": 3.7333333333333334,
+            "reverse_distance_px": 36.943231294097956,
+            "type": "wrong_way_candidate"
+          }
+        ],
+        "metrics": {
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_confirmation_delay_s": 1.7333333333333334,
+          "mean_abs_onset_error_s": 0.5333333333333332,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": 0.0,
+          "false_alarms_per_hour": 0.0
+        }
+      }
+    },
+    "shadow": {
+      "video_sha256": "8ab378fd0f0d728a5a77fc6c39bae8d2ffcbb7540916a76aba367597b4134d01",
+      "fps": 7.5,
+      "duration_s": 7.066666666666666,
+      "onset_tolerance_s": 1.0,
+      "label": {
+        "type": "wrong_way_candidate",
+        "lane_id": "shadow",
+        "start_s": 3
+      },
+      "team404": {
+        "events": [],
+        "metrics": {
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 1,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": null,
+          "false_alarms_per_hour": 0.0
+        }
+      },
+      "project": {
+        "events": [],
+        "metrics": {
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 1,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_confirmation_delay_s": null,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": null,
+          "false_alarms_per_hour": 0.0
+        }
+      }
+    },
+    "stop": {
+      "video_sha256": "1e65102ddc8909f5c0386b167f41d8eb1ab6ad5c3f250a91b7ed55144bf20643",
+      "fps": 7.5,
+      "duration_s": 21.066666666666666,
+      "onset_tolerance_s": 1.0,
+      "label": {
+        "type": "stopped_vehicle_candidate",
+        "lane_id": "stop",
+        "start_s": 5
+      },
+      "team404": {
+        "events": [],
+        "metrics": {
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 1,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": null,
+          "false_alarms_per_hour": 0.0
+        }
+      },
+      "project": {
+        "events": [
+          {
+            "track_id": "vehicle-34",
+            "lane_id": "stop",
+            "start_s": 0.9333333333333333,
+            "confirmed_s": 4.0,
+            "type": "stopped_vehicle_candidate"
+          },
+          {
+            "track_id": "vehicle-34",
+            "lane_id": "stop",
+            "start_s": 4.666666666666667,
+            "confirmed_s": 7.733333333333333,
+            "type": "stopped_vehicle_candidate"
+          }
+        ],
+        "metrics": {
+          "true_positives": 1,
+          "false_positives": 1,
+          "false_negatives": 0,
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666,
+          "mean_confirmation_delay_s": 2.7333333333333334,
+          "mean_abs_onset_error_s": 0.33333333333333304,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": 0.0,
+          "false_alarms_per_hour": 170.8860759493671
+        }
+      }
+    },
+    "red": {
+      "video_sha256": "a84d55ef1336ac163004ab4ba9453e015c4582c4647b79d0f3e4e661af7117b9",
+      "fps": 10.0,
+      "duration_s": 3.3,
+      "onset_tolerance_s": 0.5,
+      "label": {
+        "type": "red_light_crossing_candidate",
+        "lane_id": "red",
+        "start_s": 1.8
+      },
+      "team404": {
+        "events": [
+          {
+            "type": "red_light_crossing_candidate",
+            "lane_id": "red",
+            "start_s": 0.6,
+            "end_s": 3.3
+          }
+        ],
+        "metrics": {
+          "true_positives": 0,
+          "false_positives": 1,
+          "false_negatives": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": 0.0,
+          "false_alarms_per_hour": 1090.909090909091
+        }
+      },
+      "project": {
+        "events": [
+          {
+            "track_id": "vehicle-0",
+            "lane_id": "red",
+            "start_s": 2.265633977669306,
+            "confirmed_s": 2.5,
+            "type": "red_light_crossing_candidate"
+          }
+        ],
+        "metrics": {
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mean_confirmation_delay_s": 0.7,
+          "mean_abs_onset_error_s": 0.46563397766930614,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": 0.0,
+          "false_alarms_per_hour": 0.0
+        }
+      },
+      "shared_red_intervals_s": [
+        [
+          0.0,
+          3.3
+        ]
+      ],
+      "team404_shared_phase": {
+        "events": [
+          {
+            "type": "red_light_crossing_candidate",
+            "lane_id": "red",
+            "start_s": 0.6,
+            "end_s": 3.3
+          }
+        ],
+        "metrics": {
+          "true_positives": 0,
+          "false_positives": 1,
+          "false_negatives": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": 0.0,
+          "false_alarms_per_hour": 1090.909090909091
+        }
+      }
+    }
+  },
+  "environment": {
+    "gpu": "NVIDIA RTX 5090",
+    "torch": "2.10.0+cu130",
+    "ultralytics": "8.3.236",
+    "rfdetr": "1.12.1",
+    "trackers": "2.7.0",
+    "supervision": "0.32.3",
+    "opencv": "4.13.0.92"
+  },
+  "team404_red_signal_frames": {
+    "red": 17,
+    "total": 33
+  }
+}

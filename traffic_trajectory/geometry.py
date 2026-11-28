@@ -5,6 +5,20 @@ Point = tuple[float, float]
 Edge = tuple[Point, Point]
 
 
+@dataclass(frozen=True)
+class VehicleBox:
+    x: float
+    y: float
+    width: float
+    height: float
+    score: float
+    category: str | None = None
+
+    @property
+    def position(self) -> Point:
+        return self.x + self.width / 2, self.y + self.height
+
+
 def _side(start: Point, end: Point, point: Point) -> float:
     """Return the signed cross product of an edge and the offset to the point."""
     return (end[0] - start[0]) * (point[1] - start[1]) - (end[1] - start[1]) * (

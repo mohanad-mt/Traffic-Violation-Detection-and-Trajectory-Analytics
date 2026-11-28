@@ -1,0 +1,16 @@
+{
+  "duration_s": 8,
+  "events": [
+    {
+      "type": "wrong_way_candidate",
+      "lane_id": "near-carriageway",
+      "start_s": 2,
+      "trajectory": [
+        {"timestamp_s": 4, "position": [143, 75]},
+        {"timestamp_s": 5, "position": [156, 72]},
+        {"timestamp_s": 6, "position": [175, 72]},
+        {"timestamp_s": 7, "position": [188, 72]}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1232 @@
+{
+  "run_id": "external-references-and-pipeline-revisions-2026-11-27",
+  "baseline_commit": "887fdf70f01788bbeae105a034dc09d3e825d17f",
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "driver": "621.40",
+    "torch": "2.10.0+cu130",
+    "rfdetr": "1.12.1",
+    "opencv": "4.13.0",
+    "av": "19.0.2",
+    "trackers": "2.7.0",
+    "dtype": "FP32"
+  },
+  "dawn_fog": {
+    "rfdetr-small-matched": {
+      "id": "dawn-rfdetr-small",
+      "dataset": "dawn-fog",
+      "split": "fog (all 300)",
+      "archive_sha256": "09f4f8987e030b8da9e76eb73ab00b64fb628cd43df42e460bc26b9a0912c7c2",
+      "model": "rfdetr",
+      "weights_sha256": "d81979a9213a2109345158ce9232668df4c1ae52e9b8db3f2ec0a8cbad959b33",
+      "configuration": {
+        "device": "cuda",
+        "input_color": "rgb",
+        "tile_size": null,
+        "tile_confidence": null,
+        "min_cached_score": 0.01,
+        "opencv_threads": 4
+      },
+      "environment": {
+        "python": "3.13.5",
+        "opencv": "4.13.0",
+        "pycocotools": "2.0.11",
+        "platform": "Windows-11-10.0.26300-SP0"
+      },
+      "images": 300,
+      "labels": 1818,
+      "coco_class_agnostic": {
+        "map50_95": 0.55831996199296,
+        "ap50": 0.843862196802205,
+        "ap75": 0.5951029896586798,
+        "ap_small": 0.26541147768646045,
+        "ap_medium": 0.48467296876605065,
+        "ap_large": 0.7461651551225815,
+        "ar1": 0.13905390539053902,
+        "ar10": 0.5101760176017602,
+        "ar100": 0.6551705170517051,
+        "ar_small": 0.43925925925925924,
+        "ar_medium": 0.5963718820861679,
+        "ar_large": 0.8205705705705706
+      },
+      "coco_class_aware": {
+        "map50_95": 0.47189757888379813,
+        "ap50": 0.7414871517799543,
+        "ap75": 0.4976664549259072,
+        "ap_small": 0.23283726802986524,
+        "ap_medium": 0.38332003112141805,
+        "ap_large": 0.6352849511808821,
+        "ar1": 0.3116878489536955,
+        "ar10": 0.604302833820222,
+        "ar100": 0.6752073287893318,
+        "ar_small": 0.516600790513834,
+        "ar_medium": 0.6038036468105066,
+        "ar_large": 0.8016985755292187
+      },
+      "operating_points": [
+        {
+          "confidence": 0.01,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1731,
+          "false_positives": 41514,
+          "false_negatives": 87,
+          "precision": 0.040027748872702044,
+          "recall": 0.9521452145214522,
+          "small_labels": 270,
+          "small_matches": 240,
+          "small_recall": 0.8888888888888888,
+          "f1": 0.07682577724519006
+        },
+        {
+          "confidence": 0.03,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1721,
+          "false_positives": 20455,
+          "false_negatives": 97,
+          "precision": 0.07760642135642136,
+          "recall": 0.9466446644664467,
+          "small_labels": 270,
+          "small_matches": 238,
+          "small_recall": 0.8814814814814815,
+          "f1": 0.14345252979911643
+        },
+        {
+          "confidence": 0.08,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1680,
+          "false_positives": 5681,
+          "false_negatives": 138,
+          "precision": 0.2282298600733596,
+          "recall": 0.9240924092409241,
+          "small_labels": 270,
+          "small_matches": 228,
+          "small_recall": 0.8444444444444444,
+          "f1": 0.36605294694411156
+        },
+        {
+          "confidence": 0.2,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1566,
+          "false_positives": 1061,
+          "false_negatives": 252,
+          "precision": 0.596117244004568,
+          "recall": 0.8613861386138614,
+          "small_labels": 270,
+          "small_matches": 187,
+          "small_recall": 0.6925925925925925,
+          "f1": 0.7046119235095613
+        },
+        {
+          "confidence": 0.35,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1381,
+          "false_positives": 251,
+          "false_negatives": 437,
+          "precision": 0.8462009803921569,
+          "recall": 0.7596259625962596,
+          "small_labels": 270,
+          "small_matches": 126,
+          "small_recall": 0.4666666666666667,
+          "f1": 0.8005797101449276
+        },
+        {
+          "confidence": 0.5,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1186,
+          "false_positives": 68,
+          "false_negatives": 632,
+          "precision": 0.9457735247208932,
+          "recall": 0.6523652365236524,
+          "small_labels": 270,
+          "small_matches": 66,
+          "small_recall": 0.24444444444444444,
+          "f1": 0.7721354166666666
+        },
+        {
+          "confidence": 0.65,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 971,
+          "false_positives": 23,
+          "false_negatives": 847,
+          "precision": 0.9768611670020121,
+          "recall": 0.5341034103410341,
+          "small_labels": 270,
+          "small_matches": 36,
+          "small_recall": 0.13333333333333333,
+          "f1": 0.6906116642958748
+        },
+        {
+          "confidence": 0.75,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 772,
+          "false_positives": 6,
+          "false_negatives": 1046,
+          "precision": 0.9922879177377892,
+          "recall": 0.42464246424642466,
+          "small_labels": 270,
+          "small_matches": 19,
+          "small_recall": 0.07037037037037037,
+          "f1": 0.5947611710323575
+        },
+        {
+          "confidence": 0.9,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 326,
+          "false_positives": 0,
+          "false_negatives": 1492,
+          "precision": 1.0,
+          "recall": 0.1793179317931793,
+          "small_labels": 270,
+          "small_matches": 2,
+          "small_recall": 0.007407407407407408,
+          "f1": 0.3041044776119403
+        }
+      ],
+      "mean_detector_ms": 12.157782333767196,
+      "p95_detector_ms": 16.858850010612514
+    },
+    "rfdetr-large": {
+      "id": "dawn-rfdetr-large",
+      "dataset": "dawn-fog",
+      "split": "fog (all 300)",
+      "archive_sha256": "09f4f8987e030b8da9e76eb73ab00b64fb628cd43df42e460bc26b9a0912c7c2",
+      "model": "rfdetr",
+      "weights_sha256": "0f4e20e19a99c0f8a62b5685f57f6c8b5c371c59081feda6752a0561a79ccf38",
+      "configuration": {
+        "device": "cuda",
+        "input_color": "rgb",
+        "tile_size": null,
+        "tile_confidence": null,
+        "min_cached_score": 0.01,
+        "opencv_threads": 4
+      },
+      "environment": {
+        "python": "3.13.5",
+        "opencv": "4.13.0",
+        "pycocotools": "2.0.11",
+        "platform": "Windows-11-10.0.26300-SP0"
+      },
+      "images": 300,
+      "labels": 1818,
+      "coco_class_agnostic": {
+        "map50_95": 0.574350242048432,
+        "ap50": 0.861475058329455,
+        "ap75": 0.6253823356154393,
+        "ap_small": 0.28677638034795927,
+        "ap_medium": 0.5099365333182968,
+        "ap_large": 0.7471633566596724,
+        "ar1": 0.13943894389438943,
+        "ar10": 0.5182068206820682,
+        "ar100": 0.6703520352035203,
+        "ar_small": 0.47703703703703704,
+        "ar_medium": 0.6179138321995464,
+        "ar_large": 0.8181681681681681
+      },
+      "coco_class_aware": {
+        "map50_95": 0.4882524780872351,
+        "ap50": 0.7623389316849121,
+        "ap75": 0.49943068794625395,
+        "ap_small": 0.29029949628623064,
+        "ap_medium": 0.4052575293072862,
+        "ap_large": 0.6526110554363143,
+        "ar1": 0.31961502848059375,
+        "ar10": 0.6120600915986593,
+        "ar100": 0.6853827860038051,
+        "ar_small": 0.5353425559947299,
+        "ar_medium": 0.6195672768342055,
+        "ar_large": 0.8106559411209779
+      },
+      "operating_points": [
+        {
+          "confidence": 0.01,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1749,
+          "false_positives": 42497,
+          "false_negatives": 69,
+          "precision": 0.039528996971477645,
+          "recall": 0.9620462046204621,
+          "small_labels": 270,
+          "small_matches": 246,
+          "small_recall": 0.9111111111111111,
+          "f1": 0.07593782563390065
+        },
+        {
+          "confidence": 0.03,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1735,
+          "false_positives": 19442,
+          "false_negatives": 83,
+          "precision": 0.08192850734287198,
+          "recall": 0.9543454345434543,
+          "small_labels": 270,
+          "small_matches": 245,
+          "small_recall": 0.9074074074074074,
+          "f1": 0.15090237008045226
+        },
+        {
+          "confidence": 0.08,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1702,
+          "false_positives": 5274,
+          "false_negatives": 116,
+          "precision": 0.24397935779816513,
+          "recall": 0.9361936193619362,
+          "small_labels": 270,
+          "small_matches": 240,
+          "small_recall": 0.8888888888888888,
+          "f1": 0.3870821014327951
+        },
+        {
+          "confidence": 0.2,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1574,
+          "false_positives": 1063,
+          "false_negatives": 244,
+          "precision": 0.5968904057641259,
+          "recall": 0.8657865786578658,
+          "small_labels": 270,
+          "small_matches": 189,
+          "small_recall": 0.7,
+          "f1": 0.70662177328844
+        },
+        {
+          "confidence": 0.35,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1432,
+          "false_positives": 224,
+          "false_negatives": 386,
+          "precision": 0.8647342995169082,
+          "recall": 0.7876787678767877,
+          "small_labels": 270,
+          "small_matches": 133,
+          "small_recall": 0.4925925925925926,
+          "f1": 0.8244099021301093
+        },
+        {
+          "confidence": 0.5,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 1231,
+          "false_positives": 54,
+          "false_negatives": 587,
+          "precision": 0.9579766536964981,
+          "recall": 0.6771177117711771,
+          "small_labels": 270,
+          "small_matches": 70,
+          "small_recall": 0.25925925925925924,
+          "f1": 0.793425717048018
+        },
+        {
+          "confidence": 0.65,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 964,
+          "false_positives": 17,
+          "false_negatives": 854,
+          "precision": 0.9826707441386341,
+          "recall": 0.5302530253025303,
+          "small_labels": 270,
+          "small_matches": 34,
+          "small_recall": 0.1259259259259259,
+          "f1": 0.6888174347981422
+        },
+        {
+          "confidence": 0.75,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 756,
+          "false_positives": 5,
+          "false_negatives": 1062,
+          "precision": 0.9934296977660972,
+          "recall": 0.4158415841584158,
+          "small_labels": 270,
+          "small_matches": 13,
+          "small_recall": 0.04814814814814815,
+          "f1": 0.586273749515316
+        },
+        {
+          "confidence": 0.9,
+          "images": 300,
+          "iou": 0.5,
+          "labels": 1818,
+          "true_positives": 269,
+          "false_positives": 0,
+          "false_negatives": 1549,
+          "precision": 1.0,
+          "recall": 0.14796479647964797,
+          "small_labels": 270,
+          "small_matches": 1,
+          "small_recall": 0.003703703703703704,
+          "f1": 0.25778629611883086
+        }
+      ],
+      "mean_detector_ms": 12.586502332608992,
+      "p95_detector_ms": 14.205080008832738
+    }
+  },
+  "event_count_order": [
+    "true_positives",
+    "false_positives",
+    "false_negatives"
+  ],
+  "development_rule_sweep": {
+    "tracker": "bytetrack",
+    "track_start": 0.2,
+    "continuation": 0.03,
+    "trial_keys": "heading window seconds : maximum stop drift pixels per second (zero disables either)",
+    "models": {
+      "rfdetr-small-matched": {
+        "fog": {
+          "counts_by_setting": {
+            "0:0": [1, 0, 0],
+            "0.25:0": [1, 0, 0],
+            "0.4:0": [1, 0, 0],
+            "0.6:0": [1, 0, 0],
+            "0.4:0.6": [1, 0, 0],
+            "0.4:0.75": [1, 0, 0],
+            "0.4:0.9": [1, 0, 0],
+            "0:0.6": [1, 0, 0],
+            "0:0.75": [1, 0, 0],
+            "0:0.9": [1, 0, 0]
+          },
+          "baseline_events": [
+            {
+              "track_id": "vehicle-7",
+              "lane_id": "wrong",
+              "start_s": 2.533333333333333,
+              "confirmed_s": 3.7333333333333334,
+              "reverse_distance_px": 36.943231294097956,
+              "type": "wrong_way_candidate"
+            }
+          ],
+          "drift_0_75_events": [
+            {
+              "track_id": "vehicle-7",
+              "lane_id": "wrong",
+              "start_s": 2.533333333333333,
+              "confirmed_s": 3.7333333333333334,
+              "reverse_distance_px": 36.943231294097956,
+              "type": "wrong_way_candidate"
+            }
+          ]
+        },
+        "shadow": {
+          "counts_by_setting": {
+            "0:0": [0, 0, 1],
+            "0.25:0": [0, 0, 1],
+            "0.4:0": [0, 0, 1],
+            "0.6:0": [0, 1, 1],
+            "0.4:0.6": [0, 0, 1],
+            "0.4:0.75": [0, 0, 1],
+            "0.4:0.9": [0, 0, 1],
+            "0:0.6": [0, 0, 1],
+            "0:0.75": [0, 0, 1],
+            "0:0.9": [0, 0, 1]
+          },
+          "baseline_events": [],
+          "drift_0_75_events": []
+        },
+        "highway-stop": {
+          "counts_by_setting": {
+            "0:0": [1, 1, 0],
+            "0.25:0": [1, 2, 0],
+            "0.4:0": [1, 2, 0],
+            "0.6:0": [1, 2, 0],
+            "0.4:0.6": [1, 1, 0],
+            "0.4:0.75": [1, 1, 0],
+            "0.4:0.9": [1, 1, 0],
+            "0:0.6": [1, 0, 0],
+            "0:0.75": [1, 0, 0],
+            "0:0.9": [1, 0, 0]
+          },
+          "baseline_events": [
+            {
+              "track_id": "vehicle-34",
+              "lane_id": "stop",
+              "start_s": 0.9333333333333333,
+              "confirmed_s": 4.0,
+              "type": "stopped_vehicle_candidate"
+            },
+            {
+              "track_id": "vehicle-34",
+              "lane_id": "stop",
+              "start_s": 4.666666666666667,
+              "confirmed_s": 7.733333333333333,
+              "type": "stopped_vehicle_candidate"
+            }
+          ],
+          "drift_0_75_events": [
+            {
+              "track_id": "vehicle-34",
+              "lane_id": "stop",
+              "start_s": 4.666666666666667,
+              "confirmed_s": 7.733333333333333,
+              "type": "stopped_vehicle_candidate"
+            }
+          ]
+        },
+        "red": {
+          "counts_by_setting": {
+            "0:0": [1, 0, 0],
+            "0.25:0": [1, 0, 0],
+            "0.4:0": [1, 0, 0],
+            "0.6:0": [1, 0, 0],
+            "0.4:0.6": [1, 0, 0],
+            "0.4:0.75": [1, 0, 0],
+            "0.4:0.9": [1, 0, 0],
+            "0:0.6": [1, 0, 0],
+            "0:0.75": [1, 0, 0],
+            "0:0.9": [1, 0, 0]
+          },
+          "baseline_events": [
+            {
+              "track_id": "vehicle-0",
+              "lane_id": "red",
+              "start_s": 2.265633977669306,
+              "confirmed_s": 2.5,
+              "type": "red_light_crossing_candidate"
+            }
+          ],
+          "drift_0_75_events": [
+            {
+              "track_id": "vehicle-0",
+              "lane_id": "red",
+              "start_s": 2.265633977669306,
+              "confirmed_s": 2.5,
+              "type": "red_light_crossing_candidate"
+            }
+          ]
+        },
+        "night-negative": {
+          "counts_by_setting": {
+            "0:0": [0, 0, 0],
+            "0.25:0": [0, 0, 0],
+            "0.4:0": [0, 0, 0],
+            "0.6:0": [0, 0, 0],
+            "0.4:0.6": [0, 0, 0],
+            "0.4:0.75": [0, 0, 0],
+            "0.4:0.9": [0, 0, 0],
+            "0:0.6": [0, 0, 0],
+            "0:0.75": [0, 0, 0],
+            "0:0.9": [0, 0, 0]
+          },
+          "baseline_events": [],
+          "drift_0_75_events": []
+        }
+      },
+      "rfdetr-large": {
+        "fog": {
+          "counts_by_setting": {
+            "0:0": [0, 0, 1],
+            "0.25:0": [0, 0, 1],
+            "0.4:0": [0, 0, 1],
+            "0.6:0": [0, 1, 1],
+            "0.4:0.6": [0, 0, 1],
+            "0.4:0.75": [0, 0, 1],
+            "0.4:0.9": [0, 0, 1],
+            "0:0.6": [0, 0, 1],
+            "0:0.75": [0, 0, 1],
+            "0:0.9": [0, 0, 1]
+          },
+          "baseline_events": [],
+          "drift_0_75_events": []
+        },
+        "shadow": {
+          "counts_by_setting": {
+            "0:0": [0, 0, 1],
+            "0.25:0": [0, 0, 1],
+            "0.4:0": [0, 0, 1],
+            "0.6:0": [0, 0, 1],
+            "0.4:0.6": [0, 0, 1],
+            "0.4:0.75": [0, 0, 1],
+            "0.4:0.9": [0, 0, 1],
+            "0:0.6": [0, 0, 1],
+            "0:0.75": [0, 0, 1],
+            "0:0.9": [0, 0, 1]
+          },
+          "baseline_events": [],
+          "drift_0_75_events": []
+        },
+        "highway-stop": {
+          "counts_by_setting": {
+            "0:0": [0, 3, 1],
+            "0.25:0": [0, 4, 1],
+            "0.4:0": [0, 5, 1],
+            "0.6:0": [0, 5, 1],
+            "0.4:0.6": [0, 5, 1],
+            "0.4:0.75": [0, 5, 1],
+            "0.4:0.9": [0, 5, 1],
+            "0:0.6": [0, 3, 1],
+            "0:0.75": [0, 3, 1],
+            "0:0.9": [0, 3, 1]
+          },
+          "baseline_events": [
+            {
+              "track_id": "vehicle-22",
+              "lane_id": "stop",
+              "start_s": 3.2,
+              "confirmed_s": 6.266666666666667,
+              "type": "stopped_vehicle_candidate"
+            },
+            {
+              "track_id": "vehicle-58",
+              "lane_id": "stop",
+              "start_s": 3.8666666666666667,
+              "confirmed_s": 6.933333333333334,
+              "type": "stopped_vehicle_candidate"
+            },
+            {
+              "track_id": "vehicle-59",
+              "lane_id": "stop",
+              "start_s": 3.8666666666666667,
+              "confirmed_s": 6.933333333333334,
+              "type": "stopped_vehicle_candidate"
+            }
+          ],
+          "drift_0_75_events": [
+            {
+              "track_id": "vehicle-22",
+              "lane_id": "stop",
+              "start_s": 3.2,
+              "confirmed_s": 6.266666666666667,
+              "type": "stopped_vehicle_candidate"
+            },
+            {
+              "track_id": "vehicle-58",
+              "lane_id": "stop",
+              "start_s": 3.8666666666666667,
+              "confirmed_s": 6.933333333333334,
+              "type": "stopped_vehicle_candidate"
+            },
+            {
+              "track_id": "vehicle-59",
+              "lane_id": "stop",
+              "start_s": 3.8666666666666667,
+              "confirmed_s": 6.933333333333334,
+              "type": "stopped_vehicle_candidate"
+            }
+          ]
+        },
+        "red": {
+          "counts_by_setting": {
+            "0:0": [1, 0, 0],
+            "0.25:0": [1, 0, 0],
+            "0.4:0": [1, 0, 0],
+            "0.6:0": [1, 0, 0],
+            "0.4:0.6": [1, 0, 0],
+            "0.4:0.75": [1, 0, 0],
+            "0.4:0.9": [1, 0, 0],
+            "0:0.6": [1, 0, 0],
+            "0:0.75": [1, 0, 0],
+            "0:0.9": [1, 0, 0]
+          },
+          "baseline_events": [
+            {
+              "track_id": "vehicle-0",
+              "lane_id": "red",
+              "start_s": 2.2193107449494383,
+              "confirmed_s": 2.5,
+              "type": "red_light_crossing_candidate"
+            }
+          ],
+          "drift_0_75_events": [
+            {
+              "track_id": "vehicle-0",
+              "lane_id": "red",
+              "start_s": 2.2193107449494383,
+              "confirmed_s": 2.5,
+              "type": "red_light_crossing_candidate"
+            }
+          ]
+        },
+        "night-negative": {
+          "counts_by_setting": {
+            "0:0": [0, 0, 0],
+            "0.25:0": [0, 0, 0],
+            "0.4:0": [0, 0, 0],
+            "0.6:0": [0, 0, 0],
+            "0.4:0.6": [0, 0, 0],
+            "0.4:0.75": [0, 0, 0],
+            "0.4:0.9": [0, 0, 0],
+            "0:0.6": [0, 0, 0],
+            "0:0.75": [0, 0, 0],
+            "0:0.9": [0, 0, 0]
+          },
+          "baseline_events": [],
+          "drift_0_75_events": []
+        }
+      }
+    }
+  },
+  "nighttime_replay": {
+    "rfdetr": {
+      "camera-1": {
+        "video_sha256": "ac8cc33c478287cc9c049f56ca85696b61bbd1494f2cfd8d29a907a664683e1e",
+        "fps": 7.5,
+        "frames": 60,
+        "mean_detector_ms": 10.912330000428483,
+        "nearby_box_scores": [0.12375238537788391, 0.13770036399364471, 0.19835853576660156, 0.16645477712154388],
+        "runs": [
+          {
+            "tracker": "bytetrack",
+            "track_start": 0.2,
+            "continuation": 0.03,
+            "counts": [0, 0, 1],
+            "events": []
+          },
+          {
+            "tracker": "ocsort",
+            "track_start": 0.2,
+            "continuation": 0.2,
+            "counts": [0, 0, 1],
+            "events": []
+          },
+          {
+            "tracker": "bytetrack",
+            "track_start": 0.1,
+            "continuation": 0.03,
+            "counts": [1, 2, 0],
+            "events": [
+              {
+                "track_id": "vehicle-28",
+                "lane_id": "near-carriageway",
+                "start_s": 2.4,
+                "confirmed_s": 3.466666666666667,
+                "reverse_distance_px": 67.0919499912317,
+                "type": "wrong_way_candidate"
+              },
+              {
+                "track_id": "vehicle-34",
+                "lane_id": "near-carriageway",
+                "start_s": 3.2,
+                "confirmed_s": 4.266666666666667,
+                "reverse_distance_px": 45.025127182271135,
+                "type": "wrong_way_candidate"
+              },
+              {
+                "track_id": "vehicle-32",
+                "lane_id": "near-carriageway",
+                "start_s": 2.8,
+                "confirmed_s": 5.866666666666666,
+                "type": "stopped_vehicle_candidate"
+              }
+            ]
+          }
+        ]
+      },
+      "camera-2": {
+        "video_sha256": "a2d920b229f2a5ae8b650a342e80dc95d85b64ca96f488a2906e03c6a585ef4f",
+        "fps": 7.5,
+        "frames": 60,
+        "mean_detector_ms": 10.442678334463077,
+        "nearby_box_scores": [
+          null,
+          0.04441045969724655,
+          0.03372688591480255,
+          0.08898087590932846
+        ],
+        "runs": [
+          {
+            "tracker": "bytetrack",
+            "track_start": 0.2,
+            "continuation": 0.03,
+            "counts": [0, 0, 1],
+            "events": []
+          },
+          {
+            "tracker": "ocsort",
+            "track_start": 0.2,
+            "continuation": 0.2,
+            "counts": [0, 0, 1],
+            "events": []
+          },
+          {
+            "tracker": "bytetrack",
+            "track_start": 0.1,
+            "continuation": 0.03,
+            "counts": [0, 1, 1],
+            "events": [
+              {
+                "track_id": "vehicle-25",
+                "lane_id": "near-carriageway",
+                "start_s": 2.0,
+                "confirmed_s": 5.066666666666666,
+                "type": "stopped_vehicle_candidate"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "rfdetr-large": {
+      "camera-1": {
+        "video_sha256": "ac8cc33c478287cc9c049f56ca85696b61bbd1494f2cfd8d29a907a664683e1e",
+        "fps": 7.5,
+        "frames": 60,
+        "mean_detector_ms": 11.465496665914543,
+        "nearby_box_scores": [0.11895082145929337, 0.17001956701278687, 0.11836640536785126, 0.10396511107683182],
+        "runs": [
+          {
+            "tracker": "bytetrack",
+            "track_start": 0.2,
+            "continuation": 0.03,
+            "counts": [0, 1, 1],
+            "events": [
+              {
+                "track_id": "vehicle-3",
+                "lane_id": "near-carriageway",
+                "start_s": 3.7333333333333334,
+                "confirmed_s": 4.933333333333334,
+                "reverse_distance_px": 35.94157329080525,
+                "type": "wrong_way_candidate"
+              }
+            ]
+          },
+          {
+            "tracker": "ocsort",
+            "track_start": 0.2,
+            "continuation": 0.2,
+            "counts": [0, 0, 1],
+            "events": []
+          },
+          {
+            "tracker": "bytetrack",
+            "track_start": 0.1,
+            "continuation": 0.03,
+            "counts": [1, 2, 0],
+            "events": [
+              {
+                "track_id": "vehicle-13",
+                "lane_id": "near-carriageway",
+                "start_s": 2.8,
+                "confirmed_s": 3.8666666666666667,
+                "reverse_distance_px": 49.70019610794604,
+                "type": "wrong_way_candidate"
+              },
+              {
+                "track_id": "vehicle-16",
+                "lane_id": "near-carriageway",
+                "start_s": 3.066666666666667,
+                "confirmed_s": 4.133333333333334,
+                "reverse_distance_px": 42.99356357290611,
+                "type": "wrong_way_candidate"
+              },
+              {
+                "track_id": "vehicle-18",
+                "lane_id": "near-carriageway",
+                "start_s": 3.6,
+                "confirmed_s": 4.666666666666667,
+                "reverse_distance_px": 36.01750949395255,
+                "type": "wrong_way_candidate"
+              }
+            ]
+          }
+        ]
+      },
+      "camera-2": {
+        "video_sha256": "a2d920b229f2a5ae8b650a342e80dc95d85b64ca96f488a2906e03c6a585ef4f",
+        "fps": 7.5,
+        "frames": 60,
+        "mean_detector_ms": 12.54222833328337,
+        "nearby_box_scores": [
+          null,
+          null,
+          0.17864669859409332,
+          0.19610092043876648
+        ],
+        "runs": [
+          {
+            "tracker": "bytetrack",
+            "track_start": 0.2,
+            "continuation": 0.03,
+            "counts": [0, 0, 1],
+            "events": []
+          },
+          {
+            "tracker": "ocsort",
+            "track_start": 0.2,
+            "continuation": 0.2,
+            "counts": [0, 0, 1],
+            "events": []
+          },
+          {
+            "tracker": "bytetrack",
+            "track_start": 0.1,
+            "continuation": 0.03,
+            "counts": [0, 1, 1],
+            "events": [
+              {
+                "track_id": "vehicle-28",
+                "lane_id": "near-carriageway",
+                "start_s": 3.3333333333333335,
+                "confirmed_s": 6.4,
+                "type": "stopped_vehicle_candidate"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "fetv_clock": {
+    "archive_sha256": "b57feb554189596be267d0355af7a9a7aca9f5949d82747d1b396cee39793fd4",
+    "clips": 200,
+    "source_prefixes": {
+      "001": 41,
+      "002": 24,
+      "004": 34,
+      "005": 27,
+      "006": 36,
+      "009": 9,
+      "010": 5,
+      "016": 12,
+      "019": 12
+    },
+    "files_by_resolution": {
+      "(1920, 1920)": 53,
+      "(1920, 1080)": 147
+    },
+    "files_with_nonuniform_pts_steps": 198,
+    "labels_in_archive": 0,
+    "clips_over_2ms_cfr_error": 200,
+    "clips_over_10ms_cfr_error": 200,
+    "clips_over_25ms_cfr_error": 198,
+    "clips_over_50ms_cfr_error": 168,
+    "clips_over_100ms_cfr_error": 20,
+    "clips_over_250ms_cfr_error": 0,
+    "max_cfr_error_s": 0.14166666666666666,
+    "median_max_cfr_error_s": 0.06640893470790378
+  },
+  "stop_video_pts_cli": {
+    "batch_stream_equal": true,
+    "frames": 158,
+    "max_overlay_clock_error_s": 3.3333333604446125e-07,
+    "events": [
+      {
+        "track_id": "vehicle-34",
+        "lane_id": "stop",
+        "start_s": 4.666666666666667,
+        "confirmed_s": 7.733333333333333,
+        "type": "stopped_vehicle_candidate"
+      }
+    ]
+  },
+  "aicity21_archive_check": {
+    "archive_bytes": 15060951187,
+    "entry_count": 259,
+    "folders": {
+      "AIC21-Track4-Anomaly-Detection": 5,
+      "AIC21-Track4-Anomaly-Detection/aic21-track4-train-data": 102,
+      "AIC21-Track4-Anomaly-Detection/aic21-track4-test-data": 152
+    },
+    "annotation_paths": [
+      "AIC21-Track4-Anomaly-Detection/ReadMe.txt",
+      "AIC21-Track4-Anomaly-Detection/train-anomaly-results.txt",
+      "AIC21-Track4-Anomaly-Detection/license.txt"
+    ],
+    "license": "CC BY 4.0 from the archive license.txt",
+    "official_download_page": "https://www.aicitychallenge.org/2021-track4-download/"
+  },
+  "aicity21_continuous_stop_replay": {
+    "video_sha256": "c6451f72bc4e67132600f8ebc30f950de207a47a8ec65cde910f3bdff20f59e1",
+    "checkpoint_sha256": "d81979a9213a2109345158ce9232668df4c1ae52e9b8db3f2ec0a8cbad959b33",
+    "scene": {
+      "lanes": [
+        {
+          "id": "far-roadway",
+          "polygon": [
+            [
+              0,
+              176
+            ],
+            [
+              765,
+              28
+            ],
+            [
+              768,
+              45
+            ],
+            [
+              0,
+              303
+            ]
+          ],
+          "forward": [
+            -1,
+            0.3
+          ]
+        },
+        {
+          "id": "near-roadway",
+          "polygon": [
+            [
+              0,
+              310
+            ],
+            [
+              775,
+              38
+            ],
+            [
+              795,
+              37
+            ],
+            [
+              371,
+              409
+            ],
+            [
+              0,
+              409
+            ]
+          ],
+          "forward": [
+            1,
+            -0.5
+          ]
+        }
+      ],
+      "tracks": []
+    },
+    "label_onset_s": 587,
+    "onset_tolerance_s": 10,
+    "sampled_fps": 5.0,
+    "sampled_frames": 4470,
+    "duration_s": 894.0,
+    "settings_key": "stopped_duration_s:max_stopped_drift_px_s",
+    "runs": {
+      "3:0": {
+        "overall": {
+          "true_positives": 1,
+          "false_positives": 749,
+          "false_negatives": 0,
+          "precision": 0.0013333333333333333,
+          "recall": 1.0,
+          "f1": 0.002663115845539281,
+          "mean_confirmation_delay_s": 2.3999999999999773,
+          "mean_abs_onset_error_s": 0.6000000000000227,
+          "duplicate_alerts": 10,
+          "duplicate_alert_rate": 0.013333333333333334,
+          "false_alarms_per_hour": 3016.1073825503354
+        },
+        "matched_onsets": [
+          {
+            "track_id": "vehicle-4215",
+            "lane_id": "near-roadway",
+            "start_s": 586.4,
+            "confirmed_s": 589.4,
+            "type": "stopped_vehicle_candidate",
+            "position": [
+              786.6202392578125,
+              39.24626541137695
+            ],
+            "box": {
+              "x": 782.964599609375,
+              "y": 33.21047592163086,
+              "width": 7.311279296875,
+              "height": 6.035789489746094,
+              "score": 0.056248366832733154,
+              "category": "truck"
+            }
+          }
+        ],
+        "unmatched_by_anchor_y_bin_px": {
+          "0": 531,
+          "50": 134,
+          "100": 84
+        }
+      },
+      "3:0.75": {
+        "overall": {
+          "true_positives": 1,
+          "false_positives": 585,
+          "false_negatives": 0,
+          "precision": 0.0017064846416382253,
+          "recall": 1.0,
+          "f1": 0.0034071550255536627,
+          "mean_confirmation_delay_s": 2.3999999999999773,
+          "mean_abs_onset_error_s": 0.6000000000000227,
+          "duplicate_alerts": 6,
+          "duplicate_alert_rate": 0.010238907849829351,
+          "false_alarms_per_hour": 2355.7046979865772
+        },
+        "matched_onsets": [
+          {
+            "track_id": "vehicle-4215",
+            "lane_id": "near-roadway",
+            "start_s": 586.4,
+            "confirmed_s": 589.4,
+            "type": "stopped_vehicle_candidate",
+            "position": [
+              786.6202392578125,
+              39.24626541137695
+            ],
+            "box": {
+              "x": 782.964599609375,
+              "y": 33.21047592163086,
+              "width": 7.311279296875,
+              "height": 6.035789489746094,
+              "score": 0.056248366832733154,
+              "category": "truck"
+            }
+          }
+        ],
+        "unmatched_by_anchor_y_bin_px": {
+          "0": 401,
+          "50": 100,
+          "100": 84
+        }
+      },
+      "10:0": {
+        "overall": {
+          "true_positives": 1,
+          "false_positives": 38,
+          "false_negatives": 0,
+          "precision": 0.02564102564102564,
+          "recall": 1.0,
+          "f1": 0.05,
+          "mean_confirmation_delay_s": 14.399999999999977,
+          "mean_abs_onset_error_s": 4.399999999999977,
+          "duplicate_alerts": 1,
+          "duplicate_alert_rate": 0.02564102564102564,
+          "false_alarms_per_hour": 153.0201342281879
+        },
+        "matched_onsets": [
+          {
+            "track_id": "vehicle-4677",
+            "lane_id": "near-roadway",
+            "start_s": 591.4,
+            "confirmed_s": 601.4,
+            "type": "stopped_vehicle_candidate",
+            "position": [
+              594.197265625,
+              108.03874206542969
+            ],
+            "box": {
+              "x": 584.659423828125,
+              "y": 94.15283203125,
+              "width": 19.07568359375,
+              "height": 13.885910034179688,
+              "score": 0.10486717522144318,
+              "category": "truck"
+            }
+          }
+        ],
+        "unmatched_by_anchor_y_bin_px": {
+          "50": 11,
+          "100": 27
+        }
+      },
+      "10:0.75": {
+        "overall": {
+          "true_positives": 1,
+          "false_positives": 38,
+          "false_negatives": 0,
+          "precision": 0.02564102564102564,
+          "recall": 1.0,
+          "f1": 0.05,
+          "mean_confirmation_delay_s": 14.399999999999977,
+          "mean_abs_onset_error_s": 4.399999999999977,
+          "duplicate_alerts": 1,
+          "duplicate_alert_rate": 0.02564102564102564,
+          "false_alarms_per_hour": 153.0201342281879
+        },
+        "matched_onsets": [
+          {
+            "track_id": "vehicle-4677",
+            "lane_id": "near-roadway",
+            "start_s": 591.4,
+            "confirmed_s": 601.4,
+            "type": "stopped_vehicle_candidate",
+            "position": [
+              594.197265625,
+              108.03874206542969
+            ],
+            "box": {
+              "x": 584.659423828125,
+              "y": 94.15283203125,
+              "width": 19.07568359375,
+              "height": 13.885910034179688,
+              "score": 0.10486717522144318,
+              "category": "truck"
+            }
+          }
+        ],
+        "unmatched_by_anchor_y_bin_px": {
+          "50": 11,
+          "100": 27
+        }
+      },
+      "20:0": {
+        "overall": {
+          "true_positives": 0,
+          "false_positives": 6,
+          "false_negatives": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_confirmation_delay_s": null,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": 0.0,
+          "false_alarms_per_hour": 24.161073825503355
+        },
+        "matched_onsets": [],
+        "unmatched_by_anchor_y_bin_px": {
+          "100": 6
+        }
+      },
+      "20:0.75": {
+        "overall": {
+          "true_positives": 0,
+          "false_positives": 6,
+          "false_negatives": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "mean_confirmation_delay_s": null,
+          "mean_abs_onset_error_s": null,
+          "duplicate_alerts": 0,
+          "duplicate_alert_rate": 0.0,
+          "false_alarms_per_hour": 24.161073825503355
+        },
+        "matched_onsets": [],
+        "unmatched_by_anchor_y_bin_px": {
+          "100": 6
+        }
+      }
+    }
+  }
+}

@@ -1,10 +1,9 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
-from itertools import pairwise
 from math import dist, hypot
 from typing import Literal
 
-from .scenario import Lane, Observation, Scenario, StopLine, Thresholds, Track
+from .scenario import Lane, LaneZone, Observation, Scenario, StopLine, Thresholds, Track
 
 
 @dataclass(frozen=True)
@@ -38,65 +37,93 @@ class RedLightEvent:
 type Event = WrongWayEvent | StoppedVehicleEvent | RedLightEvent
 
 
-def _detect_track(track: Track, lane: Lane, thresholds: Thresholds) -> Iterator[WrongWayEvent]:
-    start = None
-    last_reverse_s = 0.0
-    emitted = False
-    samples = (
-        (observation, lane.polygon.contains(observation.position))
-        for observation in track.observations
-    )
-    for (previous, previous_in_lane), (current, current_in_lane) in pairwise(samples):
+class WrongWayState:
+    def __init__(self, track_id: str, lane: Lane, thresholds: Thresholds) -> None:
+        self.track_id = track_id
+        self.lane = lane
+        self.thresholds = thresholds
+        self.previous: Observation | None = None
+        self.previous_in_lane = False
+        self.start: Observation | None = None
+        self.last_reverse_s = 0.0
+        self.emitted = False
+
+    def update(self, current: Observation) -> WrongWayEvent | None:
+        lane, thresholds = self.lane, self.thresholds
+        current_in_lane = lane.polygon.contains(current.position)
+        previous, self.previous = self.previous, current
+        previous_in_lane, self.previous_in_lane = self.previous_in_lane, current_in_lane
+        if previous is None:
+            return None
         dx = current.position[0] - previous.position[0]
         dy = current.position[1] - previous.position[1]
         step = hypot(dx, dy)
         reverse_step = -(dx * lane.forward[0] + dy * lane.forward[1])
-        connected = (
-            previous_in_lane
-            and current_in_lane
-            and current.timestamp_s - previous.timestamp_s <= thresholds.max_gap_s
-        )
+        gap = current.timestamp_s - previous.timestamp_s
+        connected = previous_in_lane and current_in_lane and gap <= thresholds.max_gap_s
+        minimum_step = max(thresholds.min_step_px, thresholds.min_reverse_speed_px_s * gap)
         if (
             connected
-            and start is not None
-            and step < thresholds.min_step_px
-            and current.timestamp_s - last_reverse_s <= thresholds.max_pause_s
+            and self.start is not None
+            and step < minimum_step
+            and current.timestamp_s - self.last_reverse_s <= thresholds.max_pause_s
         ):
-            continue
+            return None
         qualifies = (
             connected
-            and step >= thresholds.min_step_px
+            and step >= minimum_step
+            and reverse_step >= thresholds.min_reverse_speed_px_s * gap
             and reverse_step >= step * thresholds.min_heading_cosine
         )
         if not qualifies:
-            start = None
-            emitted = False
-            continue
+            self.start = None
+            self.emitted = False
+            return None
 
-        if start is None:
-            start = previous
-        last_reverse_s = current.timestamp_s
+        if self.start is None:
+            self.start = previous
+        start = self.start
+        self.last_reverse_s = current.timestamp_s
         reverse_distance = (start.position[0] - current.position[0]) * lane.forward[0] + (
             start.position[1] - current.position[1]
         ) * lane.forward[1]
         if (
-            not emitted
+            not self.emitted
             and reverse_distance >= thresholds.min_reverse_distance_px
             and current.timestamp_s - start.timestamp_s >= thresholds.min_duration_s
         ):
-            yield WrongWayEvent(
-                track.id, lane.id, start.timestamp_s, current.timestamp_s, reverse_distance
+            self.emitted = True
+            return WrongWayEvent(
+                self.track_id, lane.id, start.timestamp_s, current.timestamp_s, reverse_distance
             )
-            emitted = True
+        return None
+
+
+def _detect_track(track: Track, lane: Lane, thresholds: Thresholds) -> Iterator[WrongWayEvent]:
+    state = WrongWayState(track.id, lane, thresholds)
+    for sample in track.observations:
+        if (event := state.update(sample)) is not None:
+            yield event
 
 
 def detect_wrong_way(scenario: Scenario) -> list[WrongWayEvent]:
     events = (
         event
         for track in scenario.tracks
-        for event in _detect_track(track, scenario.lane, scenario.thresholds)
+        for zone in scenario.zones
+        for event in _detect_track(track, zone.lane, scenario.thresholds)
     )
     return sorted(events, key=lambda event: (event.confirmed_s, event.track_id))
+
+
+def stop_window_is_ready(
+    anchor: Observation, current: Observation, thresholds: Thresholds
+) -> bool:
+    elapsed = current.timestamp_s - anchor.timestamp_s
+    max_drift = thresholds.max_stopped_drift_px_s
+    return elapsed >= thresholds.stopped_duration_s and (
+        max_drift == 0 or dist(anchor.position, current.position) <= max_drift * elapsed
+    )
 
 
 @dataclass(frozen=True)
@@ -108,12 +135,14 @@ class _StopRun:
     interrupted: bool
 
 
-def _stationary_runs(track: Track, lane: Lane, thresholds: Thresholds) -> Iterator[_StopRun]:
+def _stationary_runs(track: Track, zone: LaneZone, thresholds: Thresholds) -> Iterator[_StopRun]:
     anchor = None
     last = None
     confirmed_s = None
     for sample in track.observations:
-        in_lane = lane.polygon.contains(sample.position)
+        in_lane = zone.lane.polygon.contains(sample.position) and not any(
+            polygon.contains(sample.position) for polygon in zone.stop_exclusions
+        )
         gap = last is not None and sample.timestamp_s - last.timestamp_s > thresholds.max_gap_s
         if anchor is not None and (
             gap
@@ -128,20 +157,17 @@ def _stationary_runs(track: Track, lane: Lane, thresholds: Thresholds) -> Iterat
         if anchor is None:
             anchor = sample
         last = sample
-        if (
-            confirmed_s is None
-            and last.timestamp_s - anchor.timestamp_s >= thresholds.stopped_duration_s
-        ):
+        if confirmed_s is None and stop_window_is_ready(anchor, last, thresholds):
             confirmed_s = last.timestamp_s
 
     if anchor is not None:
         yield _StopRun(track.id, anchor, last, confirmed_s, True)
 
 
-def _detect_stopped(scenario: Scenario) -> Iterator[StoppedVehicleEvent]:
-    lane, thresholds = scenario.lane, scenario.thresholds
+def _detect_stopped(scenario: Scenario, zone: LaneZone) -> Iterator[StoppedVehicleEvent]:
+    lane, thresholds = zone.lane, scenario.thresholds
     runs = sorted(
-        (run for track in scenario.tracks for run in _stationary_runs(track, lane, thresholds)),
+        (run for track in scenario.tracks for run in _stationary_runs(track, zone, thresholds)),
         key=lambda run: (run.anchor.timestamp_s, run.track_id),
     )
     reported = []
@@ -176,37 +202,48 @@ def _detect_stopped(scenario: Scenario) -> Iterator[StoppedVehicleEvent]:
             reported.append((anchor, run))
 
 
-def _detect_red_light(
-    track: Track, lane: Lane, thresholds: Thresholds, line: StopLine
-) -> Iterator[RedLightEvent]:
-    (x, y), (end_x, end_y) = line.segment
-    dx, dy = end_x - x, end_y - y
-    length = hypot(dx, dy)
-    length_sq = length * length
-    orientation = 1 if dx * lane.forward[1] - dy * lane.forward[0] > 0 else -1
-    normal_x, normal_y = orientation * -dy / length, orientation * dx / length
-    margin = thresholds.red_line_margin_px
-    samples = (
-        (sample, normal_x * (sample.position[0] - x) + normal_y * (sample.position[1] - y))
-        for sample in track.observations
-    )
-    approached = False
-    red_crossing_s = None
-    for (previous, before), (current, after) in pairwise(samples):
+class RedLightState:
+    def __init__(self, track_id: str, lane: Lane, thresholds: Thresholds, line: StopLine) -> None:
+        self.track_id = track_id
+        self.lane = lane
+        self.thresholds = thresholds
+        self.line = line
+        self.previous: tuple[Observation, float] | None = None
+        self.approached = False
+        self.red_crossing_s: float | None = None
+        (x, y), (end_x, end_y) = line.segment
+        dx, dy = end_x - x, end_y - y
+        length = hypot(dx, dy)
+        length_sq = length * length
+        orientation = 1 if dx * lane.forward[1] - dy * lane.forward[0] > 0 else -1
+        normal_x, normal_y = orientation * -dy / length, orientation * dx / length
+        self.geometry = (x, y, dx, dy, length_sq)
+        self.normal = (normal_x, normal_y)
+
+    def update(self, current: Observation) -> RedLightEvent | None:
+        lane, line, thresholds = self.lane, self.line, self.thresholds
+        margin = thresholds.red_line_margin_px
+        x, y, dx, dy, length_sq = self.geometry
+        normal_x, normal_y = self.normal
+        after = normal_x * (current.position[0] - x) + normal_y * (current.position[1] - y)
+        last, self.previous = self.previous, (current, after)
+        if last is None:
+            return None
+        previous, before = last
         gap = current.timestamp_s - previous.timestamp_s
         if gap > thresholds.max_gap_s:
-            approached = False
-            red_crossing_s = None
-            continue
+            self.approached = False
+            self.red_crossing_s = None
+            return None
         if before < 0:
             if not lane.polygon.contains(previous.position):
-                approached = False
+                self.approached = False
             elif before <= -margin:
-                approached = True
+                self.approached = True
         if after <= 0:
-            red_crossing_s = None
-        if not approached or after <= 0:
-            continue
+            self.red_crossing_s = None
+        if not self.approached or after <= 0:
+            return None
 
         if before <= 0:
             fraction = -before / (after - before)
@@ -222,21 +259,33 @@ def _detect_red_light(
                 and lane.polygon.contains(crossing)
                 and any(start <= crossed_s < end for start, end in line.red_intervals_s)
             ):
-                red_crossing_s = crossed_s
+                self.red_crossing_s = crossed_s
 
-        if after >= margin:
-            if red_crossing_s is not None:
-                yield RedLightEvent(track.id, lane.id, red_crossing_s, current.timestamp_s)
-            approached = False
-            red_crossing_s = None
+        if after < margin:
+            return None
+        crossing_s, self.red_crossing_s = self.red_crossing_s, None
+        self.approached = False
+        if crossing_s is not None:
+            return RedLightEvent(self.track_id, lane.id, crossing_s, current.timestamp_s)
+        return None
+
+
+def _detect_red_light(
+    track: Track, lane: Lane, thresholds: Thresholds, line: StopLine
+) -> Iterator[RedLightEvent]:
+    state = RedLightState(track.id, lane, thresholds, line)
+    for sample in track.observations:
+        if (event := state.update(sample)) is not None:
+            yield event
 
 
 def detect_events(scenario: Scenario) -> list[Event]:
     events: list[Event] = list(detect_wrong_way(scenario))
-    events.extend(_detect_stopped(scenario))
-    for track in scenario.tracks:
-        if scenario.stop_line is not None:
-            events.extend(
-                _detect_red_light(track, scenario.lane, scenario.thresholds, scenario.stop_line)
-            )
+    for zone in scenario.zones:
+        events.extend(_detect_stopped(scenario, zone))
+        if zone.stop_line is not None:
+            for track in scenario.tracks:
+                events.extend(
+                    _detect_red_light(track, zone.lane, scenario.thresholds, zone.stop_line)
+                )
     return sorted(events, key=lambda event: (event.confirmed_s, event.track_id, event.type))

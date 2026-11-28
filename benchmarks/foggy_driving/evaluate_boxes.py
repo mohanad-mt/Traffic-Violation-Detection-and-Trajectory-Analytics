@@ -12,7 +12,7 @@ from cv2.typing import MatLike
 
 from traffic_trajectory.yolox import VehicleBox, YoloXDetector
 
-VEHICLE_IDS = {0, 3, 4, 6}  # car, bus, truck, motorcycle in Foggy Driving
+VEHICLE_IDS = {0: "car", 3: "bus", 4: "truck", 6: "motorcycle"}
 SMALL_AREA = 32**2
 MATCH_IOU = 0.5
 
@@ -25,7 +25,11 @@ def _labels(text: str) -> list[VehicleBox]:
         cls, xmin, ymin, xmax, ymax = map(int, line.split())
         if cls in VEHICLE_IDS:
             # The archive uses one-based inclusive coordinates.
-            boxes.append(VehicleBox(xmin - 1, ymin - 1, xmax - xmin + 1, ymax - ymin + 1, 1))
+            boxes.append(
+                VehicleBox(
+                    xmin - 1, ymin - 1, xmax - xmin + 1, ymax - ymin + 1, 1, VEHICLE_IDS[cls]
+                )
+            )
     return boxes
 
 
